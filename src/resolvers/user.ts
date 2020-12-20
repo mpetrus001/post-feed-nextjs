@@ -99,7 +99,7 @@ export class UserResolver {
   async loginUser(
     @Arg("username") username: string,
     @Arg("password") password: string,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const matchedUser = await em.findOne(User, { username });
     if (!matchedUser)
@@ -115,7 +115,10 @@ export class UserResolver {
       matchedUser.password,
       password
     );
-    if (isMatchingPassword) return { user: matchedUser };
+    if (isMatchingPassword) {
+      req.session.userId = matchedUser.id;
+      return { user: matchedUser };
+    }
     return {
       errors: [
         {
