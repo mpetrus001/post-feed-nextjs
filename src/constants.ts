@@ -1,1 +1,1 @@
-export const __prod__ = process.env.NODE_ENV === "production" ? false : true;
+export const __prod__ = process.env.NODE_ENV === "production" ? true : false;
