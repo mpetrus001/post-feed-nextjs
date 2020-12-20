@@ -31,6 +31,13 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User, { nullable: true })
+  async me(@Ctx() { em, req }: MyContext): Promise<User | null> {
+    const id = req.session.userId;
+    if (!id) return null;
+    return em.findOne(User, { id });
+  }
+
   @Query(() => [User])
   users(@Ctx() { em }: MyContext): Promise<User[]> {
     return em.find(User, {});
@@ -45,7 +52,7 @@ export class UserResolver {
   async registerUser(
     @Arg("username") username: string,
     @Arg("password") password: string,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     if (username.length < 2)
       return {
@@ -69,6 +76,7 @@ export class UserResolver {
       const hash = await argon2.hash(password);
       const newUser = em.create(User, { username, password: hash });
       await em.persistAndFlush(newUser);
+      req.session.userId = newUser.id;
       return { user: newUser };
     } catch (error) {
       if (
