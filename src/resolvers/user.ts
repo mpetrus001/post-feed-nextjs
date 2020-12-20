@@ -41,16 +41,57 @@ export class UserResolver {
     return em.findOne(User, { id });
   }
 
-  @Mutation(() => User)
+  @Mutation(() => UserResponse)
   async registerUser(
     @Arg("username") username: string,
     @Arg("password") password: string,
     @Ctx() { em }: MyContext
-  ): Promise<User> {
-    const hash = await argon2.hash(password);
-    const newUser = em.create(User, { username, password: hash });
-    await em.persistAndFlush(newUser);
-    return newUser;
+  ): Promise<UserResponse> {
+    if (username.length < 2)
+      return {
+        errors: [
+          {
+            field: "username",
+            message: "length of username must be at least 2 chars",
+          },
+        ],
+      };
+    if (password.length < 6)
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "length of password must be at least 6 chars",
+          },
+        ],
+      };
+    try {
+      const hash = await argon2.hash(password);
+      const newUser = em.create(User, { username, password: hash });
+      await em.persistAndFlush(newUser);
+      return { user: newUser };
+    } catch (error) {
+      if (
+        error.detail.includes("username") &&
+        error.detail.includes("already exists")
+      )
+        return {
+          errors: [
+            {
+              field: "username",
+              message: "username already exists",
+            },
+          ],
+        };
+    }
+    return {
+      errors: [
+        {
+          field: "unknown",
+          message: "you shouldn't get here",
+        },
+      ],
+    };
   }
 
   // TODO change errors to be less revealing
