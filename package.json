@@ -4,7 +4,10 @@
   "description": "Following along with a fullstack project tutorial by Ben Awad that teaches how to build a backend and frontend from scratch.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc -w",
+    "dev": "nodemon dist/index.js",
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +19,10 @@
   "bugs": {
     "url": "https://github.com/mpetrus001/reddit-clone/issues"
   },
-  "homepage": "https://github.com/mpetrus001/reddit-clone#readme"
+  "homepage": "https://github.com/mpetrus001/reddit-clone#readme",
+  "devDependencies": {
+    "@types/node": "^14.14.14",
+    "nodemon": "^2.0.6",
+    "typescript": "^4.1.3"
+  }
 }
