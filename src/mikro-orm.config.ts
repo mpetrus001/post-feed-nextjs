@@ -3,6 +3,7 @@ import { Post } from "./entities/Post";
 import { MikroORM } from "@mikro-orm/core";
 import path from "path";
 import dotenv from "dotenv";
+import { User } from "./entities/User";
 
 dotenv.config();
 
@@ -12,7 +13,7 @@ export default {
   dbName: process.env.POSTGRES_DB ?? "db",
   debug: !__prod__,
   type: "postgresql",
-  entities: [Post],
+  entities: [Post, User],
   migrations: {
     path: path.join(__dirname, "./migrations"),
     pattern: /^[\w-]+\d+\.[tj]s$/,
