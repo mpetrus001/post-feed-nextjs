@@ -5,22 +5,22 @@ import { MyContext } from "src/types";
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  posts(@Ctx() { em }: MyContext): Promise<Post[]> {
-    return em.find(Post, {});
+  posts(@Ctx() { orm }: MyContext): Promise<Post[]> {
+    return orm.find(Post, {});
   }
 
   @Query(() => Post, { nullable: true })
-  post(@Arg("id") id: number, @Ctx() { em }: MyContext): Promise<Post | null> {
-    return em.findOne(Post, { id });
+  post(@Arg("id") id: number, @Ctx() { orm }: MyContext): Promise<Post | null> {
+    return orm.findOne(Post, { id });
   }
 
   @Mutation(() => Post)
   async createPost(
     @Arg("title") title: string,
-    @Ctx() { em }: MyContext
+    @Ctx() { orm }: MyContext
   ): Promise<Post> {
-    const newPost = em.create(Post, { title });
-    await em.persistAndFlush(newPost);
+    const newPost = orm.create(Post, { title });
+    await orm.persistAndFlush(newPost);
     return newPost;
   }
 
@@ -28,21 +28,21 @@ export class PostResolver {
   async updatePost(
     @Arg("id") id: number,
     @Arg("title") title: string,
-    @Ctx() { em }: MyContext
+    @Ctx() { orm }: MyContext
   ): Promise<Post | null> {
-    const matchedPost = await em.findOne(Post, { id });
+    const matchedPost = await orm.findOne(Post, { id });
     if (!matchedPost) return null;
     matchedPost.title = title;
-    await em.persistAndFlush(matchedPost);
+    await orm.persistAndFlush(matchedPost);
     return matchedPost;
   }
 
   @Mutation(() => Boolean)
   async deletePost(
     @Arg("id") id: number,
-    @Ctx() { em }: MyContext
+    @Ctx() { orm }: MyContext
   ): Promise<boolean> {
-    const deletes = await em.nativeDelete(Post, { id });
+    const deletes = await orm.nativeDelete(Post, { id });
     if (deletes > 0) return true;
     return false;
   }
