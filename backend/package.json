@@ -2,7 +2,7 @@
   "name": "reddit-clone-backend",
   "version": "1.0.0",
   "description": "Following along with a fullstack project tutorial by Ben Awad that teaches how to build a backend and frontend from scratch.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w",
@@ -15,7 +15,7 @@
     "url": "git+https://github.com/mpetrus001/reddit-clone.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "MatthewP",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mpetrus001/reddit-clone/issues"
