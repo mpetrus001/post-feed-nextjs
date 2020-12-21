@@ -30,7 +30,7 @@ const InputField: React.FC<InputFieldProps> = ({
 
 export default InputField;
 
-export interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   registerOptions?: RegisterOptions;
   register: (registerOptions: RegisterOptions) => RefReturn;
