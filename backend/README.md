@@ -1,4 +1,4 @@
-# Reddit Clone
+# Reddit Clone Backend
 
 A fullstack clone of reddit built with React, Typescript, and GraphQL.
 

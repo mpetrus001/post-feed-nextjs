@@ -1,23 +1,51 @@
-# Example app with [chakra-ui](https://github.com/chakra-ui/chakra-ui)
+# Reddit Clone Backend
 
-This example features how to use [chakra-ui](https://github.com/chakra-ui/chakra-ui) as the component library within a Next.js app.
+A fullstack clone of reddit built with React, Typescript, and GraphQL.
 
-We are connecting the Next.js `_app.js` with `chakra-ui`'s Theme and ColorMode containers so the pages can have app-wide dark/light mode. We are also creating some components which shows the usage of `chakra-ui`'s style props.
+## Description
 
-## Deploy your own
+Following along with Ben Awad on a fullstack project course that teaches you how to build a backend and frontend from scratch then deploy it.
 
-Deploy the example using [Vercel](https://vercel.com):
+Includes the follow technologies:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/vercel/next.js/tree/canary/examples/with-chakra-ui)
+- TypeScript
+- NodeJS
+- PostgreSQL
+- MikroORM/TypeORM
+- GraphQL
+- TypeGraphQL
+- Redis
+- React
+- Next.js
+- Chakra
+- URQL/Apollo
 
-## How to use
+A link to the 14 hour video is here [Fullstack React GraphQL TypeScript Tutorial](https://youtu.be/I6ypD7qv3Z8).
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
+## Getting Started
+
+### Developing
+
+<!-- 1. Start the database
 
 ```bash
-npx create-next-app --example with-chakra-ui with-chakra-ui-app
-# or
-yarn create next-app --example with-chakra-ui with-chakra-ui-app
+$ docker-compose up
 ```
 
-Deploy it to the cloud with [Vercel](https://vercel.com/import?filter=next.js&utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+1. Run typescript in watch mode
+
+```bash
+$ yarn watch
+``` -->
+
+1. Run the server with auto-reload on file save
+
+```bash
+$ yarn dev
+```
+
+1. Navigate to http://localhost:3000 to reach the app
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details
