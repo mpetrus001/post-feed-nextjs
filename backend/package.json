@@ -1,5 +1,5 @@
 {
-  "name": "reddit-clone",
+  "name": "reddit-clone-backend",
   "version": "1.0.0",
   "description": "Following along with a fullstack project tutorial by Ben Awad that teaches how to build a backend and frontend from scratch.",
   "main": "index.js",
