@@ -118,7 +118,7 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: "",
+            field: "username",
             message: "login attempt failed",
           },
         ],
@@ -135,7 +135,7 @@ export class UserResolver {
     return {
       errors: [
         {
-          field: "",
+          field: "username",
           message: "login attempt failed",
         },
       ],

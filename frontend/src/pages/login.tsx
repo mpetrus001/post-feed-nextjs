@@ -2,18 +2,18 @@ import { Box, Button, Text, Link, Flex, Spacer } from "@chakra-ui/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
-import { FieldError, useRegisterUserMutation } from "../generated/graphql";
+import { FieldError, useLoginUserMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 
-interface RegisterProps {}
+interface LoginProps {}
 
 interface FormData {
   username: string;
   password: string;
 }
 
-const Register: React.FC<RegisterProps> = ({}) => {
+const Login: React.FC<LoginProps> = ({}) => {
   const router = useRouter();
   const {
     handleSubmit,
@@ -22,13 +22,13 @@ const Register: React.FC<RegisterProps> = ({}) => {
     setError,
     formState,
   } = useForm<FormData>();
-  const [, registerUser] = useRegisterUserMutation();
+  const [, loginUser] = useLoginUserMutation();
 
   async function onSubmit(values: FormData) {
-    const response = await registerUser(values);
-    if (response.data?.registerUser.errors) {
-      addServerErrors(response.data.registerUser.errors, setError);
-    } else if (response.data?.registerUser.user) {
+    const response = await loginUser(values);
+    if (response.data?.loginUser.errors) {
+      addServerErrors(response.data.loginUser.errors, setError);
+    } else if (response.data?.loginUser.user) {
       router.push("/");
     }
   }
@@ -74,9 +74,9 @@ const Register: React.FC<RegisterProps> = ({}) => {
         <Flex mt={2} alignItems={"baseline"}>
           <Spacer />
           <Text mr={4}>
-            already registered?{" "}
-            <NextLink href="/login">
-              <Link>login</Link>
+            not a user?{" "}
+            <NextLink href="/register">
+              <Link>register</Link>
             </NextLink>
           </Text>
           <Button
@@ -93,7 +93,7 @@ const Register: React.FC<RegisterProps> = ({}) => {
   );
 };
 
-export default Register;
+export default Login;
 
 function addServerErrors<T>(
   errors: FieldError[],

@@ -1,5 +1,14 @@
-import { Text } from "@chakra-ui/react";
+import React from "react";
+import NavBar from "../components/NavBar";
 
-const Index = () => <Text>Hello, World</Text>;
+interface IndexProps {}
+
+const Index: React.FC<IndexProps> = ({}) => {
+  return (
+    <>
+      <NavBar />
+    </>
+  );
+};
 
 export default Index;

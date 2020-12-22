@@ -1,4 +1,4 @@
-mutation registerUser($username: String!, $password: String!) {
+mutation RegisterUser($username: String!, $password: String!) {
   registerUser(username: $username, password: $password) {
     errors {
       field

@@ -10,7 +10,7 @@ import { RegisterOptions } from "react-hook-form";
 const InputField: React.FC<InputFieldProps> = ({
   label,
   type = "text",
-  registerOptions,
+  registerOptions = {},
   register,
   errors,
 }) => (
