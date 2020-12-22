@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "gen": "graphql-codegen --config codegen.yml"
   },
   "repository": {
     "type": "git",
@@ -25,12 +26,18 @@
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
     "framer-motion": "^2.9.4",
+    "graphql": "^15.4.0",
     "next": "latest",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-hook-form": "^6.13.1"
+    "react-hook-form": "^6.13.1",
+    "urql": "^1.11.4"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "1.19.4",
+    "@graphql-codegen/typescript": "1.19.0",
+    "@graphql-codegen/typescript-operations": "1.17.12",
+    "@graphql-codegen/typescript-urql": "^2.0.3",
     "@types/node": "^14.14.14",
     "typescript": "^4.1.3"
   }

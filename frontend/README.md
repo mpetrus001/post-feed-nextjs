@@ -1,4 +1,4 @@
-# Reddit Clone Backend
+# Reddit Clone Frontend
 
 A fullstack clone of reddit built with React, Typescript, and GraphQL.
 
@@ -45,6 +45,20 @@ $ yarn dev
 ```
 
 1. Navigate to http://localhost:3000 to reach the app
+
+### GraphQL
+
+The workflow for creating a new GraphQL Query/Mutation goes like this:
+
+1. Use the Playground to layout the operation
+1. Add the operation to a \*.graphql file in the graphql directory
+1. run the generator
+
+```bash
+$ yarn gen
+```
+
+1. Use the operation hook (with types) in the generated directory
 
 ## License
 

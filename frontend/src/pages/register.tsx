@@ -2,23 +2,31 @@ import { Box, Button, Container } from "@chakra-ui/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
+import { FieldError, useRegisterUserMutation } from "../generated/graphql";
 
 interface RegisterProps {}
 
 interface FormData {
   username: string;
+  password: string;
 }
 
 const Register: React.FC<RegisterProps> = ({}) => {
-  const { handleSubmit, errors, register, formState } = useForm<FormData>();
+  const {
+    handleSubmit,
+    errors,
+    register,
+    setError,
+    formState,
+  } = useForm<FormData>();
+  const [, registerUser] = useRegisterUserMutation();
 
-  function onSubmit(values) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
-        resolve(true);
-      }, 1000);
-    });
+  async function onSubmit(values: FormData) {
+    const response = await registerUser(values);
+    if (response.data?.registerUser.errors) {
+      addServerErrors(response.data.registerUser.errors, setError);
+    }
+    return response.data?.registerUser.user;
   }
 
   const { isSubmitting } = formState;
@@ -67,3 +75,18 @@ const Register: React.FC<RegisterProps> = ({}) => {
 };
 
 export default Register;
+
+function addServerErrors<T>(
+  errors: FieldError[],
+  setError: (
+    fieldName: keyof T,
+    error: { type: string; message: string }
+  ) => void
+) {
+  return errors.forEach(({ field, message }) => {
+    setError(field as keyof T, {
+      type: "server",
+      message: message,
+    });
+  });
+}
