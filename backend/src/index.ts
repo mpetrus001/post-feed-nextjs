@@ -9,6 +9,7 @@ import { __prod__ } from "./constants";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 import { MyContext } from "./types";
+import cors from "cors";
 
 const main = async () => {
   // Mikro-Orm interfaces with the postgres database
@@ -17,6 +18,13 @@ const main = async () => {
   await orm.getMigrator().up(); // runs the latest migration
 
   const app = express();
+
+  app.use(
+    cors({
+      origin: /localhost/,
+      credentials: true,
+    })
+  );
 
   // express-session connects to Redis to store user information
   const RedisStore = connectRedis(session);
@@ -54,7 +62,7 @@ const main = async () => {
     context: ({ req, res }): MyContext => ({ orm: orm.em, req, res }),
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log("server listening on port 4000");
