@@ -29,7 +29,7 @@ class UserResponse {
   errors?: FieldError[];
 
   @Field(() => User, { nullable: true })
-  user?: User;
+  user?: User | null;
 }
 
 // set up the GraphQL resolvers
@@ -59,25 +59,38 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async registerUser(
     @Arg("username") username: string,
+    @Arg("email") email: string,
     @Arg("password") password: string,
     @Ctx() { orm, req }: MyContext
   ): Promise<UserResponse> {
+    // validate each of the inputs
     let errors: FieldError[] = [];
     if (username.length < 2)
       errors.push({
         field: "username",
         message: "length of username must be at least 2 chars",
       });
+    if (username.includes("@"))
+      errors.push({
+        field: "username",
+        message: "username cannot contain an @ symbol",
+      });
     if (password.length < 6)
       errors.push({
         field: "password",
         message: "length of password must be at least 6 chars",
       });
+    if (email.length < 6)
+      errors.push({
+        field: "email",
+        message: "length of email must be at least 6 chars",
+      });
     if (errors.length > 0) return { errors };
 
+    // if all validation passes then proceed with register
     try {
       const hash = await argon2.hash(password);
-      const newUser = orm.create(User, { username, password: hash });
+      const newUser = orm.create(User, { username, email, password: hash });
       // persist and flush will save the entity and clear with identity map
       await orm.persistAndFlush(newUser);
       // create a session for the new user and sends a cookie
@@ -87,7 +100,7 @@ export class UserResolver {
       if (
         error.detail.includes("username") &&
         error.detail.includes("already exists")
-      )
+      ) {
         return {
           errors: [
             {
@@ -96,25 +109,44 @@ export class UserResolver {
             },
           ],
         };
+      } else if (
+        error.detail.includes("email") &&
+        error.detail.includes("already exists")
+      ) {
+        return {
+          errors: [
+            {
+              field: "email",
+              message: "email already exists",
+            },
+          ],
+        };
+      } else {
+        return {
+          errors: [
+            {
+              field: "server",
+              message: "unexpected error",
+            },
+          ],
+        };
+      }
     }
-    return {
-      errors: [
-        {
-          field: "unknown",
-          message: "you shouldn't get here",
-        },
-      ],
-    };
   }
 
   // logs in an existing user
   @Mutation(() => UserResponse)
   async loginUser(
-    @Arg("username") username: string,
+    @Arg("username") usernameOrEmail: string,
     @Arg("password") password: string,
     @Ctx() { orm, req }: MyContext
   ): Promise<UserResponse> {
-    const matchedUser = await orm.findOne(User, { username });
+    const matchedUser = await orm.findOne(
+      User,
+      usernameOrEmail.includes("@")
+        ? { email: usernameOrEmail }
+        : { username: usernameOrEmail }
+    );
     if (!matchedUser)
       return {
         errors: [
@@ -148,12 +180,11 @@ export class UserResolver {
   async logoutUser(@Ctx() { req, res }: MyContext): Promise<Boolean> {
     return new Promise((resolve) =>
       req.session.destroy((err) => {
-        // TODO decide if cookie should be removed if session isn't destroyed
-        res.clearCookie(COOKIE_NAME);
         if (err) {
           console.log(err);
           resolve(false);
         }
+        res.clearCookie(COOKIE_NAME);
         resolve(true);
       })
     );
