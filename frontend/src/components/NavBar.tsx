@@ -10,7 +10,7 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
 
   return (
     <Flex
-      bg="#9b59b6"
+      bg="purple.500"
       p={4}
       ml={"auto"}
       justifyContent={"space-between"}

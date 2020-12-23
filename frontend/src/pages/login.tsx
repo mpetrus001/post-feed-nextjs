@@ -81,7 +81,8 @@ const Login: React.FC<LoginProps> = ({}) => {
           </Text>
           <Button
             mt={4}
-            colorScheme="teal"
+            bg="purple.500"
+            color="whitesmoke"
             isLoading={isSubmitting}
             type="submit"
           >
