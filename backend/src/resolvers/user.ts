@@ -70,7 +70,7 @@ export class UserResolver {
     if (username.length < 2)
       errors.push({
         field: "username",
-        message: "length of username must be at least 2 chars",
+        message: "username must be at least 2 chars",
       });
     if (username.includes("@"))
       errors.push({
@@ -80,12 +80,12 @@ export class UserResolver {
     if (password.length < 6)
       errors.push({
         field: "password",
-        message: "length of password must be at least 6 chars",
+        message: "password must be at least 6 chars",
       });
     if (email.length < 6)
       errors.push({
         field: "email",
-        message: "length of email must be at least 6 chars",
+        message: "email must be at least 6 chars",
       });
     if (errors.length > 0) return { errors };
 
@@ -231,6 +231,66 @@ export class UserResolver {
         resolve({ user: null });
       })
     );
+  }
+
+  // change a users password
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg("password") password: string,
+    @Arg("token") token: string,
+    @Ctx() { orm, redis, req }: MyContext
+  ): Promise<UserResponse> {
+    // check if the reset token is valid
+    const matchingId = await redis.get(`reset-password-${token}`);
+    if (!matchingId)
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "token has expired",
+          },
+        ],
+      };
+    if (password.length < 6)
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "password must be at least 6 chars",
+          },
+        ],
+      };
+
+    // if all validation passes then proceed with reset
+    const id = parseInt(matchingId);
+    try {
+      const matchedUser = await orm.findOne(User, { id });
+      if (!matchedUser)
+        return {
+          errors: [
+            {
+              field: "password",
+              message: "valid token is required",
+            },
+          ],
+        };
+      const hash = await argon2.hash(password);
+      matchedUser.password = hash;
+      // persist and flush will save the entity and clear with identity map
+      await orm.persistAndFlush(matchedUser);
+      // create a session for the user and sends a cookie
+      req.session.userId = matchedUser.id;
+      return { user: matchedUser };
+    } catch (error) {
+      return {
+        errors: [
+          {
+            field: "server",
+            message: "unexpected error",
+          },
+        ],
+      };
+    }
   }
 
   // @Mutation(() => User, { nullable: true })
