@@ -3,7 +3,7 @@ import { ApolloServer } from "apollo-server-express";
 import connectRedis from "connect-redis";
 import express from "express";
 import session from "express-session";
-import redis from "redis";
+import Redis from "ioredis";
 import { buildSchema } from "type-graphql";
 import { COOKIE_NAME, __prod__ } from "./constants";
 import { PostResolver } from "./resolvers/post";
@@ -28,7 +28,7 @@ const main = async () => {
 
   // express-session connects to Redis to store user information
   const RedisStore = connectRedis(session);
-  const redisClient = redis.createClient();
+  const redisClient = new Redis();
 
   app.use(
     session({
@@ -59,7 +59,12 @@ const main = async () => {
       validate: false,
     }),
     // context is available in each resolver
-    context: ({ req, res }): MyContext => ({ orm: orm.em, req, res }),
+    context: ({ req, res }): MyContext => ({
+      orm: orm.em,
+      redis: redisClient,
+      req,
+      res,
+    }),
   });
 
   apolloServer.applyMiddleware({ app, cors: false });

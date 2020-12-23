@@ -10,7 +10,9 @@ import {
 } from "type-graphql";
 import { MyContext } from "src/types";
 import argon2 from "argon2";
+import { nanoid } from "nanoid";
 import { COOKIE_NAME } from "../constants";
+import { sendEmail } from "../utils/sendEmail";
 
 // set up custom types for server responses
 @ObjectType()
@@ -186,6 +188,47 @@ export class UserResolver {
         }
         res.clearCookie(COOKIE_NAME);
         resolve(true);
+      })
+    );
+  }
+
+  // sends password reset and logs user out of the session
+  @Mutation(() => UserResponse)
+  async resetPassword(
+    @Ctx() { orm, redis, req, res }: MyContext,
+    @Arg("email") email: string
+  ): Promise<UserResponse> {
+    const matchedUser = await orm.findOne(User, { email });
+    if (!matchedUser)
+      return {
+        errors: [
+          {
+            field: "email",
+            message: "email could not be found",
+          },
+        ],
+      };
+    const token = nanoid();
+    await redis.set(
+      `reset-password-${token}`,
+      matchedUser.id,
+      "ex",
+      1000 * 60 * 60 * 8 // 8 hours
+    );
+
+    sendEmail({
+      to: email,
+      subject: "Password Reset Link - Reddit-Clone",
+      html: `<a href="http://localhost:3000/reset-password/${token}">Reset password</a>`,
+    });
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        if (err) {
+          console.log(err);
+          resolve({ user: null });
+        }
+        res.clearCookie(COOKIE_NAME);
+        resolve({ user: null });
       })
     );
   }
