@@ -36,8 +36,7 @@ const InputField: React.FC<InputFieldProps> = ({
         </FormErrorMessage>
       </FormControl>
     );
-  }
-  if (variant === "password") {
+  } else if (variant === "password") {
     return (
       <FormControl isInvalid={!!errors[label]}>
         <FormLabel htmlFor={label}>{label}</FormLabel>
@@ -61,16 +60,41 @@ const InputField: React.FC<InputFieldProps> = ({
         </FormErrorMessage>
       </FormControl>
     );
+  } else if (variant === "email") {
+    return (
+      <FormControl isInvalid={!!errors[label]}>
+        <FormLabel htmlFor={label}>{label}</FormLabel>
+        <Input
+          name={label}
+          placeholder={label}
+          ref={register({
+            required: {
+              value: true,
+              message: "email is required",
+            },
+            minLength: {
+              value: 6,
+              message: "Minimum length is 6",
+            },
+          })}
+          type="email"
+        />
+        <FormErrorMessage>
+          {!!errors[label] && errors[label].message}
+        </FormErrorMessage>
+      </FormControl>
+    );
+  } else {
+    return (
+      <FormControl isInvalid={!!errors[label]}>
+        <FormLabel htmlFor={label}>{label}</FormLabel>
+        <Input name={label} placeholder={label} ref={register({})} />
+        <FormErrorMessage>
+          {!!errors[label] && errors[label].message}
+        </FormErrorMessage>
+      </FormControl>
+    );
   }
-  return (
-    <FormControl isInvalid={!!errors[label]}>
-      <FormLabel htmlFor={label}>{label}</FormLabel>
-      <Input name={label} placeholder={label} ref={register({})} />
-      <FormErrorMessage>
-        {!!errors[label] && errors[label].message}
-      </FormErrorMessage>
-    </FormControl>
-  );
 };
 
 export default InputField;
@@ -80,7 +104,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   register: (registerOptions: RegisterOptions) => RefReturn;
   // TODO find better type for errors as it relies on FormData
   errors: any;
-  variant?: "username" | "password";
+  variant?: "username" | "password" | "email";
 }
 
 type RefReturn =

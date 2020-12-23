@@ -12,6 +12,7 @@ interface RegisterProps {}
 
 interface FormData {
   username: string;
+  email: string;
   password: string;
 }
 
@@ -46,6 +47,14 @@ const Register: React.FC<RegisterProps> = ({}) => {
           errors={errors}
           variant="username"
         />
+        <Box mt={4}>
+          <InputField
+            label="email"
+            register={register}
+            errors={errors}
+            variant="email"
+          />
+        </Box>
         <Box mt={4}>
           <InputField
             label="password"
