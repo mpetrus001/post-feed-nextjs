@@ -9,33 +9,78 @@ import { RegisterOptions } from "react-hook-form";
 
 const InputField: React.FC<InputFieldProps> = ({
   label,
-  type = "text",
-  registerOptions = {},
   register,
   errors,
-}) => (
-  <FormControl isInvalid={!!errors[label]}>
-    <FormLabel htmlFor={label}>{label}</FormLabel>
-    <Input
-      name={label}
-      placeholder={label}
-      ref={register(registerOptions)}
-      type={type}
-    />
-    <FormErrorMessage>
-      {!!errors[label] && errors[label].message}
-    </FormErrorMessage>
-  </FormControl>
-);
+  variant,
+}) => {
+  if (variant === "username") {
+    return (
+      <FormControl isInvalid={!!errors[label]}>
+        <FormLabel htmlFor={label}>{label}</FormLabel>
+        <Input
+          name={label}
+          placeholder={label}
+          ref={register({
+            required: {
+              value: true,
+              message: "Username is required",
+            },
+            minLength: {
+              value: 2,
+              message: "Minimum length is 2",
+            },
+          })}
+        />
+        <FormErrorMessage>
+          {!!errors[label] && errors[label].message}
+        </FormErrorMessage>
+      </FormControl>
+    );
+  }
+  if (variant === "password") {
+    return (
+      <FormControl isInvalid={!!errors[label]}>
+        <FormLabel htmlFor={label}>{label}</FormLabel>
+        <Input
+          name={label}
+          placeholder={label}
+          ref={register({
+            required: {
+              value: true,
+              message: "Password is required",
+            },
+            minLength: {
+              value: 6,
+              message: "Minimum length is 6",
+            },
+          })}
+          type="password"
+        />
+        <FormErrorMessage>
+          {!!errors[label] && errors[label].message}
+        </FormErrorMessage>
+      </FormControl>
+    );
+  }
+  return (
+    <FormControl isInvalid={!!errors[label]}>
+      <FormLabel htmlFor={label}>{label}</FormLabel>
+      <Input name={label} placeholder={label} ref={register({})} />
+      <FormErrorMessage>
+        {!!errors[label] && errors[label].message}
+      </FormErrorMessage>
+    </FormControl>
+  );
+};
 
 export default InputField;
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  registerOptions?: RegisterOptions;
   register: (registerOptions: RegisterOptions) => RefReturn;
   // TODO find better type for errors as it relies on FormData
   errors: any;
+  variant?: "username" | "password";
 }
 
 type RefReturn =

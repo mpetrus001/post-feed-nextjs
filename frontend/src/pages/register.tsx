@@ -42,33 +42,14 @@ const Register: React.FC<RegisterProps> = ({}) => {
           label="username"
           register={register}
           errors={errors}
-          registerOptions={{
-            required: {
-              value: true,
-              message: "Username is required",
-            },
-            minLength: {
-              value: 2,
-              message: "Minimum length is 2",
-            },
-          }}
+          variant="username"
         />
         <Box mt={4}>
           <InputField
             label="password"
             register={register}
             errors={errors}
-            registerOptions={{
-              required: {
-                value: true,
-                message: "Password is required",
-              },
-              minLength: {
-                value: 6,
-                message: "Minimum length is 6",
-              },
-            }}
-            type="password"
+            variant="password"
           />
         </Box>
         <Flex mt={2} alignItems={"baseline"}>
