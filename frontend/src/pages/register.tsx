@@ -5,6 +5,8 @@ import InputField from "../components/InputField";
 import { FieldError, useRegisterUserMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
+import { withUrqlClient } from "next-urql";
+import createUrqlClient from "./_createUrqlClient";
 
 interface RegisterProps {}
 
@@ -75,7 +77,7 @@ const Register: React.FC<RegisterProps> = ({}) => {
   );
 };
 
-export default Register;
+export default withUrqlClient(createUrqlClient)(Register);
 
 function addServerErrors<T>(
   errors: FieldError[],

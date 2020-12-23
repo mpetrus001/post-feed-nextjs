@@ -1,0 +1,4 @@
+fragment DefaultPost on Post {
+  id
+  title
+}

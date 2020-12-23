@@ -5,6 +5,8 @@ import InputField from "../components/InputField";
 import { FieldError, useLoginUserMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
+import { withUrqlClient } from "next-urql";
+import createUrqlClient from "./_createUrqlClient";
 
 interface LoginProps {}
 
@@ -75,7 +77,7 @@ const Login: React.FC<LoginProps> = ({}) => {
   );
 };
 
-export default Login;
+export default withUrqlClient(createUrqlClient)(Login);
 
 function addServerErrors<T>(
   errors: FieldError[],

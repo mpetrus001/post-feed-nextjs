@@ -105,6 +105,11 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
+export type DefaultPostFragment = (
+  { __typename?: 'Post' }
+  & Pick<Post, 'id' | 'title'>
+);
+
 export type DefaultUserFragment = (
   { __typename?: 'User' }
   & Pick<User, 'id' | 'username'>
@@ -169,6 +174,23 @@ export type MeQuery = (
   )> }
 );
 
+export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PostsQuery = (
+  { __typename?: 'Query' }
+  & { posts: Array<(
+    { __typename?: 'Post' }
+    & DefaultPostFragment
+  )> }
+);
+
+export const DefaultPostFragmentDoc = gql`
+    fragment DefaultPost on Post {
+  id
+  title
+}
+    `;
 export const DefaultUserFragmentDoc = gql`
     fragment DefaultUser on User {
   id
@@ -228,4 +250,15 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const PostsDocument = gql`
+    query Posts {
+  posts {
+    ...DefaultPost
+  }
+}
+    ${DefaultPostFragmentDoc}`;
+
+export function usePostsQuery(options: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PostsQuery>({ query: PostsDocument, ...options });
 };
