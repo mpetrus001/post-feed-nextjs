@@ -56,6 +56,7 @@ export type Mutation = {
   deletePost: Scalars['Boolean'];
   registerUser: UserResponse;
   loginUser: UserResponse;
+  logoutUser: Scalars['Boolean'];
   deleteUser: Scalars['Boolean'];
 };
 
@@ -129,6 +130,14 @@ export type LoginUserMutation = (
   ) }
 );
 
+export type LogoutUserMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutUserMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'logoutUser'>
+);
+
 export type RegisterUserMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -182,6 +191,15 @@ export const LoginUserDocument = gql`
 
 export function useLoginUserMutation() {
   return Urql.useMutation<LoginUserMutation, LoginUserMutationVariables>(LoginUserDocument);
+};
+export const LogoutUserDocument = gql`
+    mutation LogoutUser {
+  logoutUser
+}
+    `;
+
+export function useLogoutUserMutation() {
+  return Urql.useMutation<LogoutUserMutation, LogoutUserMutationVariables>(LogoutUserDocument);
 };
 export const RegisterUserDocument = gql`
     mutation RegisterUser($username: String!, $password: String!) {

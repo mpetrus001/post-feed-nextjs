@@ -5,7 +5,7 @@ import express from "express";
 import session from "express-session";
 import redis from "redis";
 import { buildSchema } from "type-graphql";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 import { MyContext } from "./types";
@@ -36,9 +36,9 @@ const main = async () => {
         client: redisClient,
         disableTouch: true,
       }),
-      name: "reddit-clone",
+      name: COOKIE_NAME,
       // TODO change to env variable
-      secret: "__secret-reddis__",
+      secret: "__secret-redis__",
       resave: false,
       saveUninitialized: false,
       // redis also stores cookie config which is set with express-session

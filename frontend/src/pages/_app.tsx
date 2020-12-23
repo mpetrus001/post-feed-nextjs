@@ -4,6 +4,7 @@ import { AppProps } from "next/dist/next-server/lib/router/router";
 import { createClient, dedupExchange, fetchExchange, Provider } from "urql";
 import {
   LoginUserMutation,
+  LogoutUserMutation,
   MeDocument,
   MeQuery,
   RegisterUserMutation,
@@ -61,6 +62,20 @@ const client = createClient({
                     me: result.loginUser.user,
                   };
                 }
+              }
+            );
+          },
+          logoutUser: (_result, args, cache, info) => {
+            typedUpdateQuery<LogoutUserMutation, MeQuery>(
+              cache,
+              {
+                query: MeDocument,
+              },
+              _result,
+              (result, query) => {
+                return {
+                  me: null,
+                };
               }
             );
           },

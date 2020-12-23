@@ -10,6 +10,7 @@ import {
 } from "type-graphql";
 import { MyContext } from "src/types";
 import argon2 from "argon2";
+import { COOKIE_NAME } from "../constants";
 
 // set up custom types for server responses
 @ObjectType()
@@ -140,6 +141,22 @@ export class UserResolver {
         },
       ],
     };
+  }
+
+  // logs user out of the session
+  @Mutation(() => Boolean)
+  async logoutUser(@Ctx() { req, res }: MyContext): Promise<Boolean> {
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        // TODO decide if cookie should be removed if session isn't destroyed
+        res.clearCookie(COOKIE_NAME);
+        if (err) {
+          console.log(err);
+          resolve(false);
+        }
+        resolve(true);
+      })
+    );
   }
 
   // @Mutation(() => User, { nullable: true })
