@@ -1,4 +1,8 @@
 fragment DefaultPost on Post {
   id
+  createdAt
+  updatedAt
   title
+  text
+  creatorId
 }

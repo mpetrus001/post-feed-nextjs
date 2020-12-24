@@ -97,7 +97,20 @@ const InputField: React.FC<InputFieldProps> = ({
     return (
       <FormControl isInvalid={!!errors[label]}>
         <FormLabel htmlFor={label}>{label}</FormLabel>
-        <Input name={label} placeholder={label} ref={register({})} />
+        <Input
+          name={label}
+          placeholder={label}
+          ref={register({
+            required: {
+              value: true,
+              message: "field is required",
+            },
+            minLength: {
+              value: 1,
+              message: "Minimum length is 1",
+            },
+          })}
+        />
         <FormErrorMessage>
           {!!errors[label] && errors[label].message}
         </FormErrorMessage>
