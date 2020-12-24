@@ -1,4 +1,3 @@
-import { MikroORM } from "@mikro-orm/core";
 import { ApolloServer } from "apollo-server-express";
 import connectRedis from "connect-redis";
 import express from "express";
@@ -10,12 +9,18 @@ import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 import { MyContext } from "./types";
 import cors from "cors";
+import { createConnection } from "typeorm";
+import ormconfig from "./typeorm.config";
+import { User } from "./entities/User";
+import { Post } from "./entities/Post";
 
 const main = async () => {
-  // Mikro-Orm interfaces with the postgres database
+  // typeorm interfaces with the postgres database
   // and creates database tables based on the Entities in the config
-  const orm = await MikroORM.init(); // uses config from src/mikro-orm.config.ts
-  await orm.getMigrator().up(); // runs the latest migration
+  console.log(ormconfig);
+  const dbConnection = await createConnection(ormconfig);
+  const UserRepository = dbConnection.getRepository(User);
+  const PostRepository = dbConnection.getRepository(Post);
 
   const app = express();
 
@@ -60,7 +65,7 @@ const main = async () => {
     }),
     // context is available in each resolver
     context: ({ req, res }): MyContext => ({
-      orm: orm.em,
+      orm: { UserRepository, PostRepository },
       redis: redisClient,
       req,
       res,

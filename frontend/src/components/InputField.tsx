@@ -61,7 +61,9 @@ const InputField: React.FC<InputFieldProps> = ({
           {!!errors[label] && errors[label].message + "."}
           {!!errors[label] && errors[label].message.includes("token") && (
             <NextLink href="/reset-password">
-              <Link ml={1}>try again?</Link>
+              <Link ml={1} color={"purple.500"}>
+                try again?
+              </Link>
             </NextLink>
           )}
         </FormErrorMessage>

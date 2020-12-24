@@ -1,49 +1,50 @@
 import { Post } from "../entities/Post";
-import { Resolver, Query, Mutation, Ctx, Arg } from "type-graphql";
+import { Resolver, Query, Mutation, Arg, Ctx } from "type-graphql";
 import { MyContext } from "src/types";
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  posts(@Ctx() { orm }: MyContext): Promise<Post[]> {
-    return orm.find(Post, {});
+  posts(@Ctx() { orm: { PostRepository } }: MyContext): Promise<Post[]> {
+    return PostRepository.find({});
   }
 
   @Query(() => Post, { nullable: true })
-  post(@Arg("id") id: number, @Ctx() { orm }: MyContext): Promise<Post | null> {
-    return orm.findOne(Post, { id });
+  post(
+    @Arg("id") id: number,
+    @Ctx() { orm: { PostRepository } }: MyContext
+  ): Promise<Post | undefined> {
+    return PostRepository.findOne({ id });
   }
 
   @Mutation(() => Post)
   async createPost(
     @Arg("title") title: string,
-    @Ctx() { orm }: MyContext
+    @Ctx() { orm: { PostRepository } }: MyContext
   ): Promise<Post> {
-    const newPost = orm.create(Post, { title });
-    await orm.persistAndFlush(newPost);
-    return newPost;
+    return PostRepository.create({ title }).save();
   }
 
   @Mutation(() => Post, { nullable: true })
   async updatePost(
     @Arg("id") id: number,
     @Arg("title") title: string,
-    @Ctx() { orm }: MyContext
+    @Ctx() { orm: { PostRepository } }: MyContext
   ): Promise<Post | null> {
-    const matchedPost = await orm.findOne(Post, { id });
+    const matchedPost = await PostRepository.findOne({ id });
     if (!matchedPost) return null;
     matchedPost.title = title;
-    await orm.persistAndFlush(matchedPost);
+    await PostRepository.save(matchedPost);
     return matchedPost;
   }
 
   @Mutation(() => Boolean)
   async deletePost(
     @Arg("id") id: number,
-    @Ctx() { orm }: MyContext
+    @Ctx() { orm: { PostRepository } }: MyContext
   ): Promise<boolean> {
-    const deletes = await orm.nativeDelete(Post, { id });
-    if (deletes > 0) return true;
+    const { affected } = await PostRepository.delete({ id });
+    if (affected && affected > 0) return true;
     return false;
   }
 }

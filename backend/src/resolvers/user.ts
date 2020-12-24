@@ -1,4 +1,5 @@
 import { User } from "../entities/User";
+// import { getRepository } from "typeorm";
 import {
   Resolver,
   Query,
@@ -39,22 +40,27 @@ class UserResponse {
 export class UserResolver {
   // checks to see if a user is logged in
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { orm, req }: MyContext): Promise<User | null> {
+  async me(
+    @Ctx() { req, orm: { UserRepository } }: MyContext
+  ): Promise<User | undefined> {
     const id = req.session.userId;
-    if (!id) return null;
-    return orm.findOne(User, { id });
+    if (!id) return undefined;
+    return UserRepository.findOne({ id });
   }
 
   // returns all users
   @Query(() => [User])
-  users(@Ctx() { orm }: MyContext): Promise<User[]> {
-    return orm.find(User, {});
+  users(@Ctx() { orm: { UserRepository } }: MyContext): Promise<User[]> {
+    return UserRepository.find({});
   }
 
   // returns a single user by id
   @Query(() => User, { nullable: true })
-  user(@Arg("id") id: number, @Ctx() { orm }: MyContext): Promise<User | null> {
-    return orm.findOne(User, { id });
+  user(
+    @Arg("id") id: number,
+    @Ctx() { orm: { UserRepository } }: MyContext
+  ): Promise<User | undefined> {
+    return UserRepository.findOne({ id });
   }
 
   // adds a new user
@@ -63,7 +69,7 @@ export class UserResolver {
     @Arg("username") username: string,
     @Arg("email") email: string,
     @Arg("password") password: string,
-    @Ctx() { orm, req }: MyContext
+    @Ctx() { req, orm: { UserRepository } }: MyContext
   ): Promise<UserResponse> {
     // validate each of the inputs
     let errors: FieldError[] = [];
@@ -92,9 +98,12 @@ export class UserResolver {
     // if all validation passes then proceed with register
     try {
       const hash = await argon2.hash(password);
-      const newUser = orm.create(User, { username, email, password: hash });
-      // persist and flush will save the entity and clear with identity map
-      await orm.persistAndFlush(newUser);
+      const newUser = UserRepository.create({
+        username,
+        email,
+        password: hash,
+      });
+      await UserRepository.save(newUser);
       // create a session for the new user and sends a cookie
       req.session.userId = newUser.id;
       return { user: newUser };
@@ -141,10 +150,9 @@ export class UserResolver {
   async loginUser(
     @Arg("username") usernameOrEmail: string,
     @Arg("password") password: string,
-    @Ctx() { orm, req }: MyContext
+    @Ctx() { req, orm: { UserRepository } }: MyContext
   ): Promise<UserResponse> {
-    const matchedUser = await orm.findOne(
-      User,
+    const matchedUser = await UserRepository.findOne(
       usernameOrEmail.includes("@")
         ? { email: usernameOrEmail }
         : { username: usernameOrEmail }
@@ -195,10 +203,10 @@ export class UserResolver {
   // sends password reset and logs user out of the session
   @Mutation(() => UserResponse)
   async resetPassword(
-    @Ctx() { orm, redis, req, res }: MyContext,
+    @Ctx() { redis, req, res, orm: { UserRepository } }: MyContext,
     @Arg("email") email: string
   ): Promise<UserResponse> {
-    const matchedUser = await orm.findOne(User, { email });
+    const matchedUser = await UserRepository.findOne({ email });
     if (!matchedUser)
       return {
         errors: [
@@ -238,7 +246,7 @@ export class UserResolver {
   async changePassword(
     @Arg("password") password: string,
     @Arg("token") token: string,
-    @Ctx() { orm, redis }: MyContext
+    @Ctx() { redis, orm: { UserRepository } }: MyContext
   ): Promise<UserResponse> {
     // check if the reset token is valid
     const matchingId = await redis.get(`reset-password-${token}`);
@@ -265,7 +273,7 @@ export class UserResolver {
     // redis stores strings but postgres ids are int
     const id = parseInt(matchingId);
     try {
-      const matchedUser = await orm.findOne(User, { id });
+      const matchedUser = await UserRepository.findOne({ id });
       if (!matchedUser)
         return {
           errors: [
@@ -277,8 +285,7 @@ export class UserResolver {
         };
       const hash = await argon2.hash(password);
       matchedUser.password = hash;
-      // persist and flush will save the entity and clear with identity map
-      await orm.persistAndFlush(matchedUser);
+      await UserRepository.save(matchedUser);
       // remove the reset-password token from the session
       redis.del(`reset-password-${token}`);
       return { user: matchedUser };
@@ -311,10 +318,10 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async deleteUser(
     @Arg("id") id: number,
-    @Ctx() { orm }: MyContext
+    @Ctx() { orm: { UserRepository } }: MyContext
   ): Promise<boolean> {
-    const deletes = await orm.nativeDelete(User, { id });
-    if (deletes > 0) return true;
+    const { affected } = await UserRepository.delete({ id });
+    if (affected && affected > 0) return true;
     return false;
   }
 }

@@ -1,9 +1,11 @@
-import { EntityManager, IDatabaseDriver, Connection } from "@mikro-orm/core";
 import { Request, Response } from "express";
 import Redis from "ioredis";
+import { Repository } from "typeorm";
+import { Post } from "./entities/Post";
+import { User } from "./entities/User";
 
 export type MyContext = {
-  orm: EntityManager<IDatabaseDriver<Connection>>;
+  orm: MyOrm;
   redis: Redis.Redis;
   req: Request;
   res: Response;
@@ -14,3 +16,8 @@ declare module "express-session" {
     userId: number;
   }
 }
+
+type MyOrm = {
+  UserRepository: Repository<User>;
+  PostRepository: Repository<Post>;
+};
