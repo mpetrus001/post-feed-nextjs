@@ -3,9 +3,11 @@ import {
   FormLabel,
   Input,
   FormErrorMessage,
+  Link,
 } from "@chakra-ui/react";
 import React, { InputHTMLAttributes } from "react";
 import { RegisterOptions } from "react-hook-form";
+import NextLink from "next/link";
 
 const InputField: React.FC<InputFieldProps> = ({
   label,
@@ -56,7 +58,12 @@ const InputField: React.FC<InputFieldProps> = ({
           type="password"
         />
         <FormErrorMessage>
-          {!!errors[label] && errors[label].message}
+          {!!errors[label] && errors[label].message + "."}
+          {!!errors[label] && errors[label].message.includes("token") && (
+            <NextLink href="/reset-password">
+              <Link ml={1}>try again?</Link>
+            </NextLink>
+          )}
         </FormErrorMessage>
       </FormControl>
     );

@@ -238,7 +238,7 @@ export class UserResolver {
   async changePassword(
     @Arg("password") password: string,
     @Arg("token") token: string,
-    @Ctx() { orm, redis, req }: MyContext
+    @Ctx() { orm, redis }: MyContext
   ): Promise<UserResponse> {
     // check if the reset token is valid
     const matchingId = await redis.get(`reset-password-${token}`);
@@ -247,7 +247,7 @@ export class UserResolver {
         errors: [
           {
             field: "password",
-            message: "token has expired",
+            message: "token is invalid",
           },
         ],
       };
@@ -262,6 +262,7 @@ export class UserResolver {
       };
 
     // if all validation passes then proceed with reset
+    // redis stores strings but postgres ids are int
     const id = parseInt(matchingId);
     try {
       const matchedUser = await orm.findOne(User, { id });
@@ -270,7 +271,7 @@ export class UserResolver {
           errors: [
             {
               field: "password",
-              message: "valid token is required",
+              message: "token is invalid",
             },
           ],
         };
@@ -278,8 +279,8 @@ export class UserResolver {
       matchedUser.password = hash;
       // persist and flush will save the entity and clear with identity map
       await orm.persistAndFlush(matchedUser);
-      // create a session for the user and sends a cookie
-      req.session.userId = matchedUser.id;
+      // remove the reset-password token from the session
+      redis.del(`reset-password-${token}`);
       return { user: matchedUser };
     } catch (error) {
       return {

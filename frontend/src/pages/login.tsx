@@ -73,6 +73,14 @@ const Login: React.FC<LoginProps> = ({}) => {
           </Button>
         </Flex>
       </form>
+      <Flex mt={4} justifyContent="flex-end">
+        <Text>
+          forgot your password?{" "}
+          <NextLink href="/reset-password">
+            <Link>reset password</Link>
+          </NextLink>
+        </Text>
+      </Flex>
     </Box>
   );
 };
