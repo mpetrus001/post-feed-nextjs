@@ -7,8 +7,7 @@ dotenv.config();
 
 export default {
   type: "postgres" as const,
-  host: "localhost",
-  port: 5432,
+  host: process.env.POSTGRES_HOST ?? "localhost",
   username: process.env.POSTGRES_USER ?? "admin",
   password: process.env.POSTGRES_PASSWORD ?? "admin",
   database: process.env.POSTGRES_DB ?? "db",
