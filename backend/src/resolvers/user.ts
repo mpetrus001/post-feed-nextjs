@@ -14,16 +14,7 @@ import argon2 from "argon2";
 import { nanoid } from "nanoid";
 import { COOKIE_NAME } from "../constants";
 import { sendEmail } from "../utils/sendEmail";
-
-// set up custom types for server responses
-@ObjectType()
-class FieldError {
-  @Field()
-  field: string;
-
-  @Field()
-  message: string;
-}
+import { FieldError } from "./types";
 
 @ObjectType()
 class UserResponse {

@@ -8,9 +8,11 @@ import {
   InputType,
   Field,
   UseMiddleware,
+  ObjectType,
 } from "type-graphql";
 import { MyContext } from "src/types";
 import { requireAuth } from "../middleware/requireAuth";
+import { FieldError } from "./types";
 
 @InputType()
 class PostInput {
@@ -19,6 +21,16 @@ class PostInput {
 
   @Field()
   text!: string;
+}
+
+@ObjectType()
+class PostResponse {
+  // Field defines what types show up in GraphQL
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+
+  @Field(() => Post, { nullable: true })
+  post?: Post | null;
 }
 
 @Resolver()
@@ -36,16 +48,27 @@ export class PostResolver {
     return PostRepository.findOne({ id });
   }
 
-  @Mutation(() => Post)
-  @UseMiddleware(requireAuth)
+  @Mutation(() => PostResponse)
+  @UseMiddleware(requireAuth) // will throw if user session doesn't exist
   async createPost(
     @Arg("postInput") postInput: PostInput,
     @Ctx() { orm: { PostRepository }, req }: MyContext
-  ): Promise<Post> {
-    return PostRepository.create({
+  ): Promise<PostResponse> {
+    if (postInput.title.length < 1)
+      return {
+        errors: [
+          {
+            field: "title",
+            message: "title must be at least 2 chars",
+          },
+        ],
+      };
+    const newPost = await PostRepository.create({
       ...postInput,
       creatorId: req.session.userId,
-    }).save();
+    });
+    await PostRepository.save(newPost);
+    return { post: newPost };
   }
 
   @Mutation(() => Post, { nullable: true })
