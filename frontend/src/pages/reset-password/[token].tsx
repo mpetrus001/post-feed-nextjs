@@ -56,7 +56,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = () => {
             <Spacer />
             <Button
               mt={4}
-              bg="purple.500"
+              colorScheme="purple"
               color="whitesmoke"
               isLoading={isSubmitting}
               type="submit"

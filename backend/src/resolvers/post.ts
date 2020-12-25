@@ -10,6 +10,8 @@ import {
   UseMiddleware,
   ObjectType,
   Int,
+  FieldResolver,
+  Root,
 } from "type-graphql";
 import { MyContext } from "src/types";
 import { requireAuth } from "../middleware/requireAuth";
@@ -34,8 +36,13 @@ class PostResponse {
   post?: Post | null;
 }
 
-@Resolver()
+@Resolver(Post)
 export class PostResolver {
+  @FieldResolver(() => String)
+  textSnippet(@Root() root: Post) {
+    return root.text.slice(0, 150);
+  }
+
   @Query(() => [Post])
   async posts(
     @Ctx() { orm: { PostRepository } }: MyContext,

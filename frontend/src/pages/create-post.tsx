@@ -88,7 +88,7 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
             </Text>
             <Button
               mt={4}
-              bg="purple.500"
+              colorScheme="purple"
               color="whitesmoke"
               isLoading={isSubmitting}
               type="submit"

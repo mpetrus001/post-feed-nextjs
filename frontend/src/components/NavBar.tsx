@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Link, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React from "react";
 import { useLogoutUserMutation, useMeQuery } from "../generated/graphql";
@@ -25,6 +25,7 @@ const NavBar: React.FC<NavBarProps> = ({ showUser = true }) => {
       justifyContent={"space-between"}
       alignItems={"center"}
       color={"whitesmoke"}
+      mb={4}
     >
       <Heading>Reddit-Clone</Heading>
       {!showUser || !!meFetching ? null : meData?.me ? (

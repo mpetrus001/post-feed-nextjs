@@ -1,4 +1,12 @@
-import { Link } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Link,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import React from "react";
@@ -24,13 +32,39 @@ const Index: React.FC<IndexProps> = ({}) => {
         </NextLink>
       ) : null}
 
-      {postsFetching && <div>loading...</div>}
-      {postsData?.posts &&
-        postsData?.posts.map(({ id, title, text }) => (
-          <div key={id}>
-            {title}: {text}
-          </div>
-        ))}
+      <Stack mt={2} mb={6}>
+        {postsFetching && !postsData?.posts && (
+          <Box p={4} shadow="md" borderWidth="1px">
+            <Text mt={4}>Loading...</Text>
+          </Box>
+        )}
+        {!postsFetching && !postsData?.posts && (
+          <Box p={4} shadow="md" borderWidth="1px">
+            <Text mt={4} color="red">
+              something failed 😢
+            </Text>
+          </Box>
+        )}
+        {!postsFetching &&
+          postsData?.posts &&
+          postsData?.posts.map(({ id, title, textSnippet }) => (
+            <Box key={id} p={4} shadow="md" borderWidth="1px">
+              <Heading fontSize="xl">{title}</Heading>
+              <Text mt={4}>{textSnippet}</Text>
+            </Box>
+          ))}
+      </Stack>
+      {postsData?.posts && (
+        <Flex justifyContent="center" mb={6}>
+          <Button
+            isLoading={postsFetching}
+            colorScheme="purple"
+            color="whitesmoke"
+          >
+            load more
+          </Button>
+        </Flex>
+      )}
     </Layout>
   );
 };

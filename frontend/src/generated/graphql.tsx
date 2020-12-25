@@ -48,6 +48,7 @@ export type Post = {
   text: Scalars['String'];
   points: Scalars['Float'];
   creatorId: Scalars['Float'];
+  textSnippet: Scalars['String'];
 };
 
 export type User = {
@@ -142,7 +143,7 @@ export type UserResponse = {
 
 export type DefaultPostFragment = (
   { __typename?: 'Post' }
-  & Pick<Post, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'text' | 'creatorId'>
+  & Pick<Post, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'text' | 'textSnippet' | 'creatorId'>
 );
 
 export type DefaultPostResponseFragment = (
@@ -281,6 +282,7 @@ export const DefaultPostFragmentDoc = gql`
   updatedAt
   title
   text
+  textSnippet
   creatorId
 }
     `;

@@ -4,5 +4,6 @@ fragment DefaultPost on Post {
   updatedAt
   title
   text
+  textSnippet
   creatorId
 }
