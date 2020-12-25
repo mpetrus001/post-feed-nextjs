@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { useMeQuery, usePostsQuery } from "../generated/graphql";
 import createUrqlClient from "../utils/_createUrqlClient";
@@ -21,8 +21,12 @@ const Index: React.FC<IndexProps> = ({}) => {
   const [{ data: meData, fetching: meFetching }] = useMeQuery({
     pause: isServer(),
   });
+  const [postsQueryVars, setPostsQueryArgs] = useState({
+    limit: 10,
+    cursor: null as null | string,
+  });
   const [{ data: postsData, fetching: postsFetching }, posts] = usePostsQuery({
-    variables: { limit: 10 },
+    variables: { ...postsQueryVars },
   });
   return (
     <Layout>
@@ -40,9 +44,7 @@ const Index: React.FC<IndexProps> = ({}) => {
         )}
         {!postsFetching && !postsData?.posts && (
           <Box p={4} shadow="md" borderWidth="1px">
-            <Text mt={4} color="red">
-              something failed 😢
-            </Text>
+            <Text mt={4}>something failed 😢</Text>
           </Box>
         )}
         {!postsFetching &&
@@ -60,6 +62,12 @@ const Index: React.FC<IndexProps> = ({}) => {
             isLoading={postsFetching}
             colorScheme="purple"
             color="whitesmoke"
+            onClick={() =>
+              setPostsQueryArgs({
+                limit: 10,
+                cursor: postsData.posts[postsData.posts.length - 1].createdAt,
+              })
+            }
           >
             load more
           </Button>
