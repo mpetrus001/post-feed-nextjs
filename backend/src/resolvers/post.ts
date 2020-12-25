@@ -49,7 +49,7 @@ export class PostResolver {
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null
   ): Promise<Post[]> {
-    const serverLimit = Math.min(100, limit);
+    const serverLimit = Math.min(50, limit);
     const postsQuery = await PostRepository.createQueryBuilder("posts")
       // double quote due to postgres being case sensitive
       .orderBy('"createdAt"', "DESC")
