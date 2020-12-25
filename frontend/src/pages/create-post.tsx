@@ -1,8 +1,4 @@
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   Flex,
@@ -22,8 +18,8 @@ import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
 import Layout from "../components/Layout";
 import { FieldError, useCreatePostMutation } from "../generated/graphql";
-import createUrqlClient from "./_createUrqlClient";
-import useRequireAuth from "./_useRequireAuth";
+import createUrqlClient from "../utils/_createUrqlClient";
+import useRequireAuth from "../utils/_useRequireAuth";
 
 interface CreatePostProps {}
 
@@ -34,7 +30,8 @@ interface FormData {
 
 const CreatePost: React.FC<CreatePostProps> = ({}) => {
   const router = useRouter();
-  const [{ data: meData, fetching: meFetching }] = useRequireAuth();
+  // will redirect if user is not logged in
+  useRequireAuth();
   const {
     handleSubmit,
     errors,
@@ -58,13 +55,6 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
   return (
     <Layout>
       <Box mt={8} maxWidth={400} mx={"auto"}>
-        {!meFetching && !meData?.me ? (
-          <Alert status="error" mb={4}>
-            <AlertIcon />
-            <AlertTitle mr={2}>not logged in.</AlertTitle>
-            <AlertDescription>your changes will not be saved.</AlertDescription>
-          </Alert>
-        ) : null}
         <form onSubmit={handleSubmit(onSubmit)}>
           <InputField label="title" register={register} errors={errors} />
           <Box mt={4}>

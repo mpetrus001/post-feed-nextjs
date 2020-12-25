@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import InputField from "../../components/InputField";
 import Layout from "../../components/Layout";
 import { FieldError, useChangePasswordMutation } from "../../generated/graphql";
-import createUrqlClient from "../_createUrqlClient";
+import createUrqlClient from "../../utils/_createUrqlClient";
 
 interface ChangePasswordProps {
   token: string;

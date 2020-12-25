@@ -1,8 +1,8 @@
-import { Box, Flex, Heading, Link, Text, Button } from "@chakra-ui/react";
+import { Button, Flex, Heading, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React from "react";
 import { useLogoutUserMutation, useMeQuery } from "../generated/graphql";
-import { isServer } from "../pages/_isServer";
+import { isServer } from "../utils/_isServer";
 
 interface NavBarProps {
   showUser?: boolean;

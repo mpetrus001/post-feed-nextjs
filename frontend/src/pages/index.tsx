@@ -3,9 +3,9 @@ import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import React from "react";
 import Layout from "../components/Layout";
-import { isServer } from "./_isServer";
 import { useMeQuery, usePostsQuery } from "../generated/graphql";
-import createUrqlClient from "./_createUrqlClient";
+import createUrqlClient from "../utils/_createUrqlClient";
+import { isServer } from "../utils/_isServer";
 
 interface IndexProps {}
 

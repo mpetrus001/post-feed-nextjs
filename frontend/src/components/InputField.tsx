@@ -1,13 +1,13 @@
 import {
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
-  FormErrorMessage,
   Link,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import React, { InputHTMLAttributes } from "react";
 import { RegisterOptions } from "react-hook-form";
-import NextLink from "next/link";
 
 const InputField: React.FC<InputFieldProps> = ({
   label,

@@ -1,13 +1,13 @@
-import { Box, Button, Text, Link, Flex, Spacer } from "@chakra-ui/react";
+import { Box, Button, Flex, Link, Spacer, Text } from "@chakra-ui/react";
+import { withUrqlClient } from "next-urql";
+import NextLink from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
-import { FieldError, useLoginUserMutation } from "../generated/graphql";
-import { useRouter } from "next/router";
-import NextLink from "next/link";
-import { withUrqlClient } from "next-urql";
-import createUrqlClient from "./_createUrqlClient";
 import Layout from "../components/Layout";
+import { FieldError, useLoginUserMutation } from "../generated/graphql";
+import createUrqlClient from "../utils/_createUrqlClient";
 
 interface LoginProps {}
 
@@ -32,7 +32,10 @@ const Login: React.FC<LoginProps> = ({}) => {
     if (response.data?.loginUser.errors) {
       addServerErrors(response.data.loginUser.errors, setError);
     } else if (response.data?.loginUser.user) {
-      router.push("/");
+      // will send them back to the page if they were redirected here
+      router.push(
+        typeof router.query.next === "string" ? router.query.next : "/"
+      );
     }
   }
 

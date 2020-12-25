@@ -1,5 +1,7 @@
-import { cacheExchange, QueryInput, Cache } from "@urql/exchange-graphcache";
+import { Cache, cacheExchange, QueryInput } from "@urql/exchange-graphcache";
+import Router from "next/router";
 import { dedupExchange, Exchange, fetchExchange } from "urql";
+import { pipe, tap } from "wonka";
 import {
   CreatePostMutation,
   LoginUserMutation,
@@ -10,8 +12,6 @@ import {
   PostsQuery,
   RegisterUserMutation,
 } from "../generated/graphql";
-import { pipe, tap } from "wonka";
-import Router from "next/router";
 
 const errorExchange: Exchange = ({ forward }) => (ops$) => {
   return pipe(
@@ -93,7 +93,8 @@ const createUrqlClient = (ssrExchange: any) => ({
               },
               _result,
               (result, query) => {
-                if (result.createPost.post) {
+                // query might be null when redirected back to createPost from useRequireAuth
+                if (result.createPost.post && query) {
                   return {
                     posts: [...query.posts, result.createPost.post],
                   };
