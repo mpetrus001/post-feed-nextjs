@@ -17,8 +17,8 @@ import { Post } from "./entities/Post";
 const main = async () => {
   // typeorm interfaces with the postgres database
   // and creates database tables based on the Entities in the config
-  console.log(ormconfig);
   const dbConnection = await createConnection(ormconfig);
+  await dbConnection.runMigrations();
   const UserRepository = dbConnection.getRepository(User);
   const PostRepository = dbConnection.getRepository(Post);
 
