@@ -5,7 +5,6 @@ import {
   AlertTitle,
   Box,
   Button,
-  CloseButton,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -22,13 +21,9 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
 import Layout from "../components/Layout";
-import { isServer } from "../components/_isServer";
-import {
-  FieldError,
-  useCreatePostMutation,
-  useMeQuery,
-} from "../generated/graphql";
+import { FieldError, useCreatePostMutation } from "../generated/graphql";
 import createUrqlClient from "./_createUrqlClient";
+import useRequireAuth from "./_useRequireAuth";
 
 interface CreatePostProps {}
 
@@ -39,9 +34,7 @@ interface FormData {
 
 const CreatePost: React.FC<CreatePostProps> = ({}) => {
   const router = useRouter();
-  const [{ data: meData, fetching: meFetching }] = useMeQuery({
-    pause: isServer(),
-  });
+  const [{ data: meData, fetching: meFetching }] = useRequireAuth();
   const {
     handleSubmit,
     errors,
