@@ -43,6 +43,7 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
 
   async function onSubmit(values: FormData) {
     const response = await createPost({ postInput: values });
+    console.log(response.data);
     if (response.data?.createPost.errors) {
       addServerErrors(response.data.createPost.errors, setError);
     } else if (response.data?.createPost.post) {

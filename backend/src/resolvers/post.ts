@@ -84,6 +84,7 @@ export class PostResolver {
           },
         ],
       };
+
     const newPost = await PostRepository.create({
       ...postInput,
       creatorId: req.session.userId,

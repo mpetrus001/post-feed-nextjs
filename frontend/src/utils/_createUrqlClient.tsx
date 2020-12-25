@@ -85,25 +85,29 @@ const createUrqlClient = (ssrExchange: any) => ({
               }
             );
           },
-          createPost: (_result, args, cache, info) => {
-            typedUpdateQuery<CreatePostMutation, PostsQuery>(
-              cache,
-              {
-                query: PostsDocument,
-              },
-              _result,
-              (result, query) => {
-                // query might be null when redirected back to createPost from useRequireAuth
-                if (result.createPost.post && query) {
-                  return {
-                    posts: [...query.posts, result.createPost.post],
-                  };
-                } else {
-                  return query;
-                }
-              }
-            );
-          },
+          // createPost: (_result, args, cache, info) => {
+          //   typedUpdateQuery<CreatePostMutation, PostsQuery>(
+          //     cache,
+          //     {
+          //       query: PostsDocument,
+          //       variables: { limit: 10 },
+          //     },
+          //     _result,
+          //     (result, query) => {
+          //       // query might be null when redirected back to createPost from useRequireAuth
+          //       if (
+          //         !result.createPost.errors &&
+          //         result.createPost.post &&
+          //         query
+          //       ) {
+          //         query.posts.unshift(result.createPost.post);
+          //         return query;
+          //       } else {
+          //         return query;
+          //       }
+          //     }
+          //   );
+          // },
         },
       },
     }),
