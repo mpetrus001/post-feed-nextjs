@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
+import Layout from "../components/Layout";
 import { FieldError, useCreatePostMutation } from "../generated/graphql";
 import createUrqlClient from "./_createUrqlClient";
 
@@ -49,50 +50,52 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
   const { isSubmitting } = formState;
 
   return (
-    <Box mt={8} maxWidth={400} mx={"auto"}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <InputField label="title" register={register} errors={errors} />
-        <Box mt={4}>
-          <FormControl isInvalid={!!errors["text"]}>
-            <FormLabel htmlFor="text">text</FormLabel>
-            <Textarea
-              name="text"
-              placeholder="enter text for your post"
-              ref={register({
-                required: {
-                  value: true,
-                  message: "field is required",
-                },
-                minLength: {
-                  value: 1,
-                  message: "Minimum length is 1",
-                },
-              })}
-            />
-            <FormErrorMessage>
-              {!!errors["text"] && errors["text"].message}
-            </FormErrorMessage>
-          </FormControl>
-        </Box>
-        <Flex mt={2} alignItems={"baseline"}>
-          <Spacer />
-          <Text mr={4}>
-            <NextLink href="/">
-              <Link>cancel</Link>
-            </NextLink>
-          </Text>
-          <Button
-            mt={4}
-            bg="purple.500"
-            color="whitesmoke"
-            isLoading={isSubmitting}
-            type="submit"
-          >
-            create
-          </Button>
-        </Flex>
-      </form>
-    </Box>
+    <Layout>
+      <Box mt={8} maxWidth={400} mx={"auto"}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <InputField label="title" register={register} errors={errors} />
+          <Box mt={4}>
+            <FormControl isInvalid={!!errors["text"]}>
+              <FormLabel htmlFor="text">text</FormLabel>
+              <Textarea
+                name="text"
+                placeholder="enter text for your post"
+                ref={register({
+                  required: {
+                    value: true,
+                    message: "field is required",
+                  },
+                  minLength: {
+                    value: 1,
+                    message: "Minimum length is 1",
+                  },
+                })}
+              />
+              <FormErrorMessage>
+                {!!errors["text"] && errors["text"].message}
+              </FormErrorMessage>
+            </FormControl>
+          </Box>
+          <Flex mt={2} alignItems={"baseline"}>
+            <Spacer />
+            <Text mr={4}>
+              <NextLink href="/">
+                <Link>cancel</Link>
+              </NextLink>
+            </Text>
+            <Button
+              mt={4}
+              bg="purple.500"
+              color="whitesmoke"
+              isLoading={isSubmitting}
+              type="submit"
+            >
+              create
+            </Button>
+          </Flex>
+        </form>
+      </Box>
+    </Layout>
   );
 };
 

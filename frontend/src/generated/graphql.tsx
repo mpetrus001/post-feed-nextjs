@@ -181,8 +181,7 @@ export type ChangePasswordMutation = (
 );
 
 export type CreatePostMutationVariables = Exact<{
-  title: Scalars['String'];
-  text: Scalars['String'];
+  postInput: PostInput;
 }>;
 
 
@@ -316,8 +315,8 @@ export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
 };
 export const CreatePostDocument = gql`
-    mutation CreatePost($title: String!, $text: String!) {
-  createPost(postInput: {title: $title, text: $text}) {
+    mutation CreatePost($postInput: PostInput!) {
+  createPost(postInput: $postInput) {
     ...DefaultPostResponse
   }
 }

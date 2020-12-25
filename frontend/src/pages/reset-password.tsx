@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
+import Layout from "../components/Layout";
 import { FieldError, useResetPasswordMutation } from "../generated/graphql";
 import createUrqlClient from "./_createUrqlClient";
 
@@ -37,34 +38,36 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({}) => {
   const { isSubmitting } = formState;
 
   return (
-    <Box mt={8} maxWidth={400} mx={"auto"}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <InputField
-          label="email"
-          register={register}
-          errors={errors}
-          variant="email"
-        />
-        <Flex mt={2} alignItems={"baseline"}>
-          <Spacer />
-          <Text mr={4}>
-            remember now?{" "}
-            <NextLink href="/login">
-              <Link>login</Link>
-            </NextLink>
-          </Text>
-          <Button
-            mt={4}
-            bg="purple.500"
-            color="whitesmoke"
-            isLoading={isSubmitting}
-            type="submit"
-          >
-            reset
-          </Button>
-        </Flex>
-      </form>
-    </Box>
+    <Layout>
+      <Box mt={8} maxWidth={400} mx={"auto"}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <InputField
+            label="email"
+            register={register}
+            errors={errors}
+            variant="email"
+          />
+          <Flex mt={2} alignItems={"baseline"}>
+            <Spacer />
+            <Text mr={4}>
+              remember now?{" "}
+              <NextLink href="/login">
+                <Link>login</Link>
+              </NextLink>
+            </Text>
+            <Button
+              mt={4}
+              bg="purple.500"
+              color="whitesmoke"
+              isLoading={isSubmitting}
+              type="submit"
+            >
+              reset
+            </Button>
+          </Flex>
+        </form>
+      </Box>
+    </Layout>
   );
 };
 

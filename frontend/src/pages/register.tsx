@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import NextLink from "next/link";
 import { withUrqlClient } from "next-urql";
 import createUrqlClient from "./_createUrqlClient";
+import Layout from "../components/Layout";
 
 interface RegisterProps {}
 
@@ -39,50 +40,52 @@ const Register: React.FC<RegisterProps> = ({}) => {
   const { isSubmitting } = formState;
 
   return (
-    <Box mt={8} maxWidth={400} mx={"auto"}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <InputField
-          label="username"
-          register={register}
-          errors={errors}
-          variant="username"
-        />
-        <Box mt={4}>
+    <Layout showUser={false}>
+      <Box mt={8} maxWidth={400} mx={"auto"}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <InputField
-            label="email"
+            label="username"
             register={register}
             errors={errors}
-            variant="email"
+            variant="username"
           />
-        </Box>
-        <Box mt={4}>
-          <InputField
-            label="password"
-            register={register}
-            errors={errors}
-            variant="password"
-          />
-        </Box>
-        <Flex mt={2} alignItems={"baseline"}>
-          <Spacer />
-          <Text mr={4}>
-            already registered?{" "}
-            <NextLink href="/login">
-              <Link>login</Link>
-            </NextLink>
-          </Text>
-          <Button
-            mt={4}
-            bg="purple.500"
-            color="whitesmoke"
-            isLoading={isSubmitting}
-            type="submit"
-          >
-            login
-          </Button>
-        </Flex>
-      </form>
-    </Box>
+          <Box mt={4}>
+            <InputField
+              label="email"
+              register={register}
+              errors={errors}
+              variant="email"
+            />
+          </Box>
+          <Box mt={4}>
+            <InputField
+              label="password"
+              register={register}
+              errors={errors}
+              variant="password"
+            />
+          </Box>
+          <Flex mt={2} alignItems={"baseline"}>
+            <Spacer />
+            <Text mr={4}>
+              already registered?{" "}
+              <NextLink href="/login">
+                <Link>login</Link>
+              </NextLink>
+            </Text>
+            <Button
+              mt={4}
+              bg="purple.500"
+              color="whitesmoke"
+              isLoading={isSubmitting}
+              type="submit"
+            >
+              login
+            </Button>
+          </Flex>
+        </form>
+      </Box>
+    </Layout>
   );
 };
 

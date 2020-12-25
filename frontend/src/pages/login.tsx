@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import NextLink from "next/link";
 import { withUrqlClient } from "next-urql";
 import createUrqlClient from "./_createUrqlClient";
+import Layout from "../components/Layout";
 
 interface LoginProps {}
 
@@ -38,50 +39,52 @@ const Login: React.FC<LoginProps> = ({}) => {
   const { isSubmitting } = formState;
 
   return (
-    <Box mt={8} maxWidth={400} mx={"auto"}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <InputField
-          label="username"
-          register={register}
-          errors={errors}
-          variant="username"
-        />
-        <Box mt={4}>
+    <Layout showUser={false}>
+      <Box mt={8} maxWidth={400} mx={"auto"}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <InputField
-            label="password"
+            label="username"
             register={register}
             errors={errors}
-            variant="password"
+            variant="username"
           />
-        </Box>
-        <Flex mt={2} alignItems={"baseline"}>
-          <Spacer />
-          <Text mr={4}>
-            not a user?{" "}
-            <NextLink href="/register">
-              <Link>register</Link>
+          <Box mt={4}>
+            <InputField
+              label="password"
+              register={register}
+              errors={errors}
+              variant="password"
+            />
+          </Box>
+          <Flex mt={2} alignItems={"baseline"}>
+            <Spacer />
+            <Text mr={4}>
+              not a user?{" "}
+              <NextLink href="/register">
+                <Link>register</Link>
+              </NextLink>
+            </Text>
+            <Button
+              mt={4}
+              bg="purple.500"
+              color="whitesmoke"
+              isLoading={isSubmitting}
+              type="submit"
+            >
+              login
+            </Button>
+          </Flex>
+        </form>
+        <Flex mt={4} justifyContent="flex-end">
+          <Text>
+            forgot your password?{" "}
+            <NextLink href="/reset-password">
+              <Link>reset password</Link>
             </NextLink>
           </Text>
-          <Button
-            mt={4}
-            bg="purple.500"
-            color="whitesmoke"
-            isLoading={isSubmitting}
-            type="submit"
-          >
-            login
-          </Button>
         </Flex>
-      </form>
-      <Flex mt={4} justifyContent="flex-end">
-        <Text>
-          forgot your password?{" "}
-          <NextLink href="/reset-password">
-            <Link>reset password</Link>
-          </NextLink>
-        </Text>
-      </Flex>
-    </Box>
+      </Box>
+    </Layout>
   );
 };
 

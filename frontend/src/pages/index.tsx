@@ -2,6 +2,7 @@ import { Link } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import React from "react";
+import Layout from "../components/Layout";
 import NavBar from "../components/NavBar";
 import { isServer } from "../components/_isServer";
 import { useMeQuery, usePostsQuery } from "../generated/graphql";
@@ -15,11 +16,10 @@ const Index: React.FC<IndexProps> = ({}) => {
   });
   const [{ data: postsData, fetching: postsFetching }, posts] = usePostsQuery();
   return (
-    <>
-      <NavBar />
+    <Layout>
       {!!meFetching ? null : meData?.me ? (
         <NextLink href="/create-post">
-          <Link>+add post</Link>
+          <Link>+create post</Link>
         </NextLink>
       ) : null}
 
@@ -30,7 +30,7 @@ const Index: React.FC<IndexProps> = ({}) => {
             {title}: {text}
           </div>
         ))}
-    </>
+    </Layout>
   );
 };
 

@@ -1,5 +1,5 @@
-mutation CreatePost($title: String!, $text: String!) {
-  createPost(postInput: { title: $title, text: $text }) {
+mutation CreatePost($postInput: PostInput!) {
+  createPost(postInput: $postInput) {
     ...DefaultPostResponse
   }
 }

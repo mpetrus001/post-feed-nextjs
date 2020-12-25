@@ -4,9 +4,11 @@ import React from "react";
 import { useLogoutUserMutation, useMeQuery } from "../generated/graphql";
 import { isServer } from "./_isServer";
 
-interface NavBarProps {}
+interface NavBarProps {
+  showUser?: boolean;
+}
 
-const NavBar: React.FC<NavBarProps> = ({}) => {
+const NavBar: React.FC<NavBarProps> = ({ showUser = true }) => {
   const [{ data: meData, fetching: meFetching }] = useMeQuery({
     pause: isServer(),
   });
@@ -25,9 +27,9 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
       color={"whitesmoke"}
     >
       <Heading>Reddit-Clone</Heading>
-      {!!meFetching ? null : meData?.me ? (
+      {!showUser || !!meFetching ? null : meData?.me ? (
         <Flex>
-          <Text>Hello, {meData.me.username}</Text>
+          <Text>{meData.me.username}</Text>
           <Button
             variant="link"
             ml={2}
