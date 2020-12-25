@@ -9,15 +9,13 @@ import Layout from "../../components/Layout";
 import { FieldError, useChangePasswordMutation } from "../../generated/graphql";
 import createUrqlClient from "../../utils/_createUrqlClient";
 
-interface ChangePasswordProps {
-  token: string;
-}
+interface ChangePasswordProps {}
 
 interface FormData {
   password: string;
 }
 
-const ChangePassword: NextPage<ChangePasswordProps> = ({ token }) => {
+const ChangePassword: React.FC<ChangePasswordProps> = () => {
   const router = useRouter();
   const {
     handleSubmit,
@@ -30,7 +28,10 @@ const ChangePassword: NextPage<ChangePasswordProps> = ({ token }) => {
 
   async function onSubmit(values: FormData) {
     // TODO add flash messages to show success/fail states
-    const response = await changePassword({ password: values.password, token });
+    const response = await changePassword({
+      password: values.password,
+      token: typeof router.query.token === "string" ? router.query.token : "",
+    });
     if (response.data?.changePassword.errors) {
       // TODO flash on errors that are not part of FormData
       addServerErrors(response.data.changePassword.errors, setError);
@@ -69,14 +70,7 @@ const ChangePassword: NextPage<ChangePasswordProps> = ({ token }) => {
   );
 };
 
-ChangePassword.getInitialProps = ({ query }) => {
-  return {
-    token: query.token as string,
-  };
-};
-
-// implement fix of this "as React.FC" when types are fixed
-export default withUrqlClient(createUrqlClient)(ChangePassword as React.FC);
+export default withUrqlClient(createUrqlClient)(ChangePassword);
 
 function addServerErrors<T>(
   errors: FieldError[],
