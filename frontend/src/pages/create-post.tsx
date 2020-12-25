@@ -1,6 +1,11 @@
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
+  CloseButton,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -17,7 +22,12 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
 import Layout from "../components/Layout";
-import { FieldError, useCreatePostMutation } from "../generated/graphql";
+import { isServer } from "../components/_isServer";
+import {
+  FieldError,
+  useCreatePostMutation,
+  useMeQuery,
+} from "../generated/graphql";
 import createUrqlClient from "./_createUrqlClient";
 
 interface CreatePostProps {}
@@ -29,6 +39,9 @@ interface FormData {
 
 const CreatePost: React.FC<CreatePostProps> = ({}) => {
   const router = useRouter();
+  const [{ data: meData, fetching: meFetching }] = useMeQuery({
+    pause: isServer(),
+  });
   const {
     handleSubmit,
     errors,
@@ -52,6 +65,13 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
   return (
     <Layout>
       <Box mt={8} maxWidth={400} mx={"auto"}>
+        {!meFetching && !meData?.me ? (
+          <Alert status="error" mb={4}>
+            <AlertIcon />
+            <AlertTitle mr={2}>not logged in.</AlertTitle>
+            <AlertDescription>your changes will not be saved.</AlertDescription>
+          </Alert>
+        ) : null}
         <form onSubmit={handleSubmit(onSubmit)}>
           <InputField label="title" register={register} errors={errors} />
           <Box mt={4}>

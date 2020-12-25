@@ -40,11 +40,9 @@ const NavBar: React.FC<NavBarProps> = ({ showUser = true }) => {
           </Button>
         </Flex>
       ) : (
-        <Box>
-          <NextLink href="/login">
-            <Link>Login</Link>
-          </NextLink>
-        </Box>
+        <NextLink href="/login">
+          <Link>Login</Link>
+        </NextLink>
       )}
     </Flex>
   );
