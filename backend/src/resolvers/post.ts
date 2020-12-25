@@ -9,6 +9,7 @@ import {
   Field,
   UseMiddleware,
   ObjectType,
+  Int,
 } from "type-graphql";
 import { MyContext } from "src/types";
 import { requireAuth } from "../middleware/requireAuth";
@@ -36,8 +37,21 @@ class PostResponse {
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  posts(@Ctx() { orm: { PostRepository } }: MyContext): Promise<Post[]> {
-    return PostRepository.find({});
+  async posts(
+    @Ctx() { orm: { PostRepository } }: MyContext,
+    @Arg("limit", () => Int) limit: number,
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+  ): Promise<Post[]> {
+    const serverLimit = Math.min(100, limit);
+    const postsQuery = await PostRepository.createQueryBuilder("posts")
+      // double quote due to postgres being case sensitive
+      .orderBy('"createdAt"', "DESC")
+      .take(serverLimit);
+    if (cursor)
+      postsQuery.where('"createdAt" < :cursor', {
+        cursor: new Date(parseInt(cursor)),
+      });
+    return postsQuery.getMany();
   }
 
   @Query(() => Post, { nullable: true })

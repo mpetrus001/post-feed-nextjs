@@ -13,7 +13,9 @@ const Index: React.FC<IndexProps> = ({}) => {
   const [{ data: meData, fetching: meFetching }] = useMeQuery({
     pause: isServer(),
   });
-  const [{ data: postsData, fetching: postsFetching }, posts] = usePostsQuery();
+  const [{ data: postsData, fetching: postsFetching }, posts] = usePostsQuery({
+    variables: { limit: 10 },
+  });
   return (
     <Layout>
       {!meFetching && meData?.me ? (
