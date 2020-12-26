@@ -2,6 +2,8 @@ import { Post } from "../entities/Post";
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class SeedPostData1608873846892 implements MigrationInterface {
+  newPosts: Post[] = [];
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     const PostRepository = queryRunner.connection.getRepository(Post);
     const dataString = JSON.stringify([
@@ -706,11 +708,11 @@ export class SeedPostData1608873846892 implements MigrationInterface {
         createdAt: "2020-02-16 13:01:48",
       },
     ]);
-    await PostRepository.save(JSON.parse(dataString));
+    this.newPosts = await PostRepository.save(JSON.parse(dataString));
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const PostRepository = queryRunner.connection.getRepository(Post);
-    await PostRepository.clear();
+    await PostRepository.remove(this.newPosts);
   }
 }

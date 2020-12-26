@@ -2,9 +2,10 @@ import { User } from "../entities/User";
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class SeedUserData1608873836820 implements MigrationInterface {
+  newUsers: User[] = [];
   public async up(queryRunner: QueryRunner): Promise<void> {
     const UserRepository = queryRunner.connection.getRepository(User);
-    await UserRepository.save([
+    this.newUsers = await UserRepository.save([
       {
         username: "sophie",
         email: "sophie@computer.local",
@@ -28,6 +29,6 @@ export class SeedUserData1608873836820 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const UserRepository = queryRunner.connection.getRepository(User);
-    await UserRepository.clear();
+    await UserRepository.remove(this.newUsers);
   }
 }
