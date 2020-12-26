@@ -35,6 +35,7 @@ const Index = () => {
   );
 };
 
+// incorporated from Ben Awad's improved pagination approach
 type PageProps = {
   variables: PostsQueryVariables;
   isLastPage: boolean;
@@ -78,54 +79,5 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
     </>
   );
 };
-
-// const Index: React.FC<IndexProps> = ({}) => {
-//   const [postsPageInfo, setpostsPageInfo] = useState({
-//     skip: 0,
-//     take: 10,
-//   });
-//   const [{ data: postsData, fetching: postsFetching }] = usePostsQuery({
-//     variables: { ...postsPageInfo },
-//   });
-//   return (
-//     <Layout>
-//       <Stack mt={2} mb={6}>
-//         {postsFetching && !postsData?.posts && (
-//           <Box p={4} shadow="md" borderWidth="1px">
-//             <Text>loading...</Text>
-//           </Box>
-//         )}
-//         {!postsFetching && !postsData?.posts && (
-//           <Box p={4} shadow="md" borderWidth="1px">
-//             <Text>something failed 😢</Text>
-//           </Box>
-//         )}
-//         {!postsFetching &&
-//           postsData?.posts &&
-//           postsData?.posts.map(({ id, title, textSnippet }) => (
-//             <Box key={id} p={4} shadow="md" borderWidth="1px">
-//               <Heading fontSize="xl">{title}</Heading>
-//               <Text mt={4}>{textSnippet}</Text>
-//             </Box>
-//           ))}
-//       </Stack>
-//       <Flex justifyContent="center" mb={6}>
-//         <Button
-//           isLoading={postsFetching}
-//           colorScheme="purple"
-//           color="whitesmoke"
-//           onClick={() =>
-//             setpostsPageInfo({
-//               skip: postsPageInfo.skip + postsPageInfo.take,
-//               take: 10,
-//             })
-//           }
-//         >
-//           load more
-//         </Button>
-//       </Flex>
-//     </Layout>
-//   );
-// };
 
 export default withUrqlClient(createUrqlClient, { ssr: true })(Index);

@@ -1,23 +1,23 @@
-import { Post } from "../entities/Post";
+import { UserInputError } from "apollo-server-express";
+import { MyContext } from "src/types";
 import {
-  Resolver,
-  Query,
-  Mutation,
   Arg,
   Ctx,
-  InputType,
   Field,
-  UseMiddleware,
-  Int,
   FieldResolver,
-  Root,
+  InputType,
+  Int,
+  Mutation,
   ObjectType,
+  Query,
+  Resolver,
+  Root,
+  UseMiddleware,
 } from "type-graphql";
-import { MyContext } from "src/types";
+import { getConnection } from "typeorm";
+import { Post } from "../entities/Post";
 import { requireAuth } from "../middleware/requireAuth";
 import { FieldError } from "./types";
-import { UserInputError } from "apollo-server-express";
-import { getConnection } from "typeorm";
 
 @InputType()
 class PostInput {
@@ -49,7 +49,6 @@ export class PostResolver {
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null
   ): Promise<PaginatedPosts> {
-    // 20 -> 21
     const realLimit = Math.min(50, limit);
     const reaLimitPlusOne = realLimit + 1;
 
