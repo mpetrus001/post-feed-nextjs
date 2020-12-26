@@ -8,15 +8,16 @@ import {
   InputType,
   Field,
   UseMiddleware,
-  ObjectType,
   Int,
   FieldResolver,
   Root,
+  ObjectType,
 } from "type-graphql";
 import { MyContext } from "src/types";
 import { requireAuth } from "../middleware/requireAuth";
 import { FieldError } from "./types";
 import { UserInputError } from "apollo-server-express";
+import { getConnection } from "typeorm";
 
 @InputType()
 class PostInput {
@@ -27,37 +28,12 @@ class PostInput {
   text!: string;
 }
 
-@InputType()
-class PageInfoInput {
-  @Field(() => Boolean, { nullable: true })
-  hasNextPage?: boolean;
-
-  @Field(() => Int, { nullable: true })
-  limit?: number;
-
-  @Field(() => String, { nullable: true })
-  cursor?: string;
-}
-
-@ObjectType()
-class PageInfoOutput {
-  @Field(() => Boolean)
-  hasNextPage: boolean;
-
-  @Field(() => Int)
-  limit: number;
-
-  @Field(() => String)
-  cursor: string;
-}
-
 @ObjectType()
 class PaginatedPosts {
   @Field(() => [Post])
   posts: Post[];
-
-  @Field(() => PageInfoOutput)
-  pageInfo: PageInfoOutput;
+  @Field()
+  hasMore: boolean;
 }
 
 @Resolver(Post)
@@ -67,35 +43,59 @@ export class PostResolver {
     return root.text.slice(0, 150);
   }
 
+  // borrowed from Ben Awad's lireddit
   @Query(() => PaginatedPosts)
   async posts(
-    @Ctx() { orm: { PostRepository } }: MyContext,
-    @Arg("pageInfo", () => PageInfoInput)
-    pageInfo: PageInfoInput
+    @Arg("limit", () => Int) limit: number,
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
   ): Promise<PaginatedPosts> {
-    const limit = pageInfo.limit ?? 10;
-    const cursor = pageInfo.cursor ?? Date.now().toString();
-    const serverLimit = Math.min(50, limit) + 1;
-    const posts = await PostRepository.createQueryBuilder("posts")
-      // double quote due to postgres being case sensitive
-      .orderBy('"createdAt"', "DESC")
-      .take(serverLimit)
-      .where('"createdAt" < :cursor', {
-        cursor: new Date(parseInt(cursor)),
-      })
-      .getMany();
+    // 20 -> 21
+    const realLimit = Math.min(50, limit);
+    const reaLimitPlusOne = realLimit + 1;
+
+    const replacements: any[] = [reaLimitPlusOne];
+
+    if (cursor) {
+      replacements.push(new Date(parseInt(cursor)));
+    }
+
+    const posts = await getConnection().query(
+      `
+    select p.*
+    from post p
+    ${cursor ? `where p."createdAt" < $2` : ""}
+    order by p."createdAt" DESC
+    limit $1
+    `,
+      replacements
+    );
 
     return {
-      // slice to remove the extra added for hasNextPage
-      posts: posts.slice(0, serverLimit - 1),
-      pageInfo: {
-        hasNextPage: posts.length === serverLimit,
-        limit,
-        // convert the Date back to an int, then to a string
-        cursor: posts[posts.length - 1].createdAt.valueOf().toString(),
-      },
+      posts: posts.slice(0, realLimit),
+      hasMore: posts.length === reaLimitPlusOne,
     };
   }
+
+  // @Query(() => [Post])
+  // async posts(
+  //   @Ctx() { orm: { PostRepository } }: MyContext,
+  //   @Arg("skip", () => Int, { nullable: true })
+  //   skip?: number,
+  //   @Arg("take", () => Int, { nullable: true })
+  //   take?: number
+  // ): Promise<Post[]> {
+  //   skip = skip ?? 0;
+  //   take = take ?? 10;
+  //   const serverLimit = Math.min(50, take);
+  //   const posts = await PostRepository.createQueryBuilder("posts")
+  //     // double quote due to postgres being case sensitive
+  //     .orderBy('"createdAt"', "DESC")
+  //     .skip(skip)
+  //     .take(serverLimit)
+  //     .getMany();
+
+  //   return posts;
+  // }
 
   @Query(() => Post, { nullable: true })
   async post(

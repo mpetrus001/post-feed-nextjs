@@ -31,6 +31,9 @@ const NavBar: React.FC<NavBarProps> = ({ showUser = true }) => {
       {!showUser || !!meFetching ? null : meData?.me ? (
         <Flex>
           <Text>{meData.me.username}</Text>
+          <NextLink href="/create-post">
+            <Link>+create post</Link>
+          </NextLink>
           <Button
             variant="link"
             ml={2}

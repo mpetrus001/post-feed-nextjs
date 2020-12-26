@@ -25,7 +25,8 @@ export type Query = {
 
 
 export type QueryPostsArgs = {
-  pageInfo: PageInfoInput;
+  cursor?: Maybe<Scalars['String']>;
+  limit: Scalars['Int'];
 };
 
 
@@ -41,7 +42,7 @@ export type QueryUserArgs = {
 export type PaginatedPosts = {
   __typename?: 'PaginatedPosts';
   posts: Array<Post>;
-  pageInfo: PageInfoOutput;
+  hasMore: Scalars['Boolean'];
 };
 
 export type Post = {
@@ -54,19 +55,6 @@ export type Post = {
   points: Scalars['Float'];
   creatorId: Scalars['Float'];
   textSnippet: Scalars['String'];
-};
-
-export type PageInfoOutput = {
-  __typename?: 'PageInfoOutput';
-  hasNextPage: Scalars['Boolean'];
-  limit: Scalars['Int'];
-  cursor: Scalars['String'];
-};
-
-export type PageInfoInput = {
-  hasNextPage?: Maybe<Scalars['Boolean']>;
-  limit?: Maybe<Scalars['Int']>;
-  cursor?: Maybe<Scalars['String']>;
 };
 
 export type User = {
@@ -220,7 +208,8 @@ export type MeQuery = (
 );
 
 export type PostsQueryVariables = Exact<{
-  pageInfo: PageInfoInput;
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -228,10 +217,8 @@ export type PostsQuery = (
   { __typename?: 'Query' }
   & { posts: (
     { __typename?: 'PaginatedPosts' }
-    & { pageInfo: (
-      { __typename?: 'PageInfoOutput' }
-      & Pick<PageInfoOutput, 'hasNextPage' | 'limit' | 'cursor'>
-    ), posts: Array<(
+    & Pick<PaginatedPosts, 'hasMore'>
+    & { posts: Array<(
       { __typename?: 'Post' }
       & DefaultPostFragment
     )> }
@@ -329,13 +316,9 @@ export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'q
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
 export const PostsDocument = gql`
-    query Posts($pageInfo: PageInfoInput!) {
-  posts(pageInfo: $pageInfo) {
-    pageInfo {
-      hasNextPage
-      limit
-      cursor
-    }
+    query Posts($limit: Int!, $cursor: String) {
+  posts(limit: $limit, cursor: $cursor) {
+    hasMore
     posts {
       ...DefaultPost
     }
