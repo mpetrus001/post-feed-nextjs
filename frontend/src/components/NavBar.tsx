@@ -32,7 +32,7 @@ const NavBar: React.FC<NavBarProps> = ({ showUser = true }) => {
         <Flex>
           <Text>{meData.me.username}</Text>
           <NextLink href="/create-post">
-            <Link>+create post</Link>
+            <Link ml={2}>+create post</Link>
           </NextLink>
           <Button
             variant="link"

@@ -6,13 +6,14 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
 import Layout from "../components/Layout";
-import { FieldError, useResetPasswordMutation } from "../generated/graphql";
+import { useResetPasswordMutation } from "../generated/graphql";
+import { addServerErrors } from "../utils/addServerErrors";
 import createUrqlClient from "../utils/_createUrqlClient";
 
 interface ResetPasswordProps {}
 
 interface FormData {
-  email: string;
+  username: string;
 }
 
 const ResetPassword: React.FC<ResetPasswordProps> = ({}) => {
@@ -28,10 +29,15 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({}) => {
 
   async function onSubmit(values: FormData) {
     const response = await resetPassword(values);
-    if (response.data?.resetPassword.errors) {
-      addServerErrors(response.data.resetPassword.errors, setError);
-    } else {
+    if (response.error?.graphQLErrors[0].extensions?.fieldErrors) {
+      addServerErrors(
+        response.error.graphQLErrors[0].extensions.fieldErrors,
+        setError
+      );
+    } else if (response.data?.resetPassword) {
       router.push("/");
+    } else {
+      console.error("Received an error: ", response.error);
     }
   }
 
@@ -42,10 +48,10 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({}) => {
       <Box mt={8} maxWidth={400} mx={"auto"}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <InputField
-            label="email"
+            label="username"
             register={register}
             errors={errors}
-            variant="email"
+            variant="username"
           />
           <Flex mt={2} alignItems={"baseline"}>
             <Spacer />
@@ -72,18 +78,3 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({}) => {
 };
 
 export default withUrqlClient(createUrqlClient)(ResetPassword);
-
-function addServerErrors<T>(
-  errors: FieldError[],
-  setError: (
-    fieldName: keyof T,
-    error: { type: string; message: string }
-  ) => void
-) {
-  return errors.forEach(({ field, message }) => {
-    setError(field as keyof T, {
-      type: "server",
-      message: message,
-    });
-  });
-}

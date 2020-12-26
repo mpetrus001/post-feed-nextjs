@@ -6,7 +6,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
 import Layout from "../components/Layout";
-import { FieldError, useLoginUserMutation } from "../generated/graphql";
+import { useLoginUserMutation } from "../generated/graphql";
+import { addServerErrors } from "../utils/addServerErrors";
 import createUrqlClient from "../utils/_createUrqlClient";
 
 interface LoginProps {}
@@ -29,13 +30,15 @@ const Login: React.FC<LoginProps> = ({}) => {
 
   async function onSubmit(values: FormData) {
     const response = await loginUser(values);
-    if (response.data?.loginUser.errors) {
-      addServerErrors(response.data.loginUser.errors, setError);
-    } else if (response.data?.loginUser.user) {
-      // will send them back to the page if they were redirected here
-      router.push(
-        typeof router.query.next === "string" ? router.query.next : "/"
+    if (response.error?.graphQLErrors[0].extensions?.fieldErrors) {
+      addServerErrors(
+        response.error.graphQLErrors[0].extensions.fieldErrors,
+        setError
       );
+    } else if (response.data?.loginUser) {
+      router.push("/");
+    } else {
+      console.error("Received an error: ", response.error);
     }
   }
 
@@ -92,18 +95,3 @@ const Login: React.FC<LoginProps> = ({}) => {
 };
 
 export default withUrqlClient(createUrqlClient)(Login);
-
-function addServerErrors<T>(
-  errors: FieldError[],
-  setError: (
-    fieldName: keyof T,
-    error: { type: string; message: string }
-  ) => void
-) {
-  return errors.forEach(({ field, message }) => {
-    setError(field as keyof T, {
-      type: "server",
-      message: message,
-    });
-  });
-}

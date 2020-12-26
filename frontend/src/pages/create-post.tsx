@@ -17,7 +17,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
 import Layout from "../components/Layout";
-import { FieldError, useCreatePostMutation } from "../generated/graphql";
+import { useCreatePostMutation } from "../generated/graphql";
+import { addServerErrors } from "../utils/addServerErrors";
 import createUrqlClient from "../utils/_createUrqlClient";
 import useRequireAuth from "../utils/_useRequireAuth";
 
@@ -43,11 +44,15 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
 
   async function onSubmit(values: FormData) {
     const response = await createPost({ postInput: values });
-    console.log(response.data);
-    if (response.data?.createPost.errors) {
-      addServerErrors(response.data.createPost.errors, setError);
-    } else if (response.data?.createPost.post) {
+    if (response.error?.graphQLErrors[0].extensions?.fieldErrors) {
+      addServerErrors(
+        response.error.graphQLErrors[0].extensions.fieldErrors,
+        setError
+      );
+    } else if (response.data?.createPost) {
       router.push("/");
+    } else {
+      console.error("Received an error: ", response.error);
     }
   }
 
@@ -104,18 +109,3 @@ const CreatePost: React.FC<CreatePostProps> = ({}) => {
 };
 
 export default withUrqlClient(createUrqlClient)(CreatePost);
-
-function addServerErrors<T>(
-  errors: FieldError[],
-  setError: (
-    fieldName: keyof T,
-    error: { type: string; message: string }
-  ) => void
-) {
-  return errors.forEach(({ field, message }) => {
-    setError(field as keyof T, {
-      type: "server",
-      message: message,
-    });
-  });
-}

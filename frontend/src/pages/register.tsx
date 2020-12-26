@@ -6,7 +6,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../components/InputField";
 import Layout from "../components/Layout";
-import { FieldError, useRegisterUserMutation } from "../generated/graphql";
+import { useRegisterUserMutation } from "../generated/graphql";
+import { addServerErrors } from "../utils/addServerErrors";
 import createUrqlClient from "../utils/_createUrqlClient";
 
 interface RegisterProps {}
@@ -29,11 +30,16 @@ const Register: React.FC<RegisterProps> = ({}) => {
   const [, registerUser] = useRegisterUserMutation();
 
   async function onSubmit(values: FormData) {
-    const response = await registerUser(values);
-    if (response.data?.registerUser.errors) {
-      addServerErrors(response.data.registerUser.errors, setError);
-    } else if (response.data?.registerUser.user) {
+    const response = await registerUser({ userInput: values });
+    if (response.error?.graphQLErrors[0].extensions?.fieldErrors) {
+      addServerErrors(
+        response.error.graphQLErrors[0].extensions.fieldErrors,
+        setError
+      );
+    } else if (response.data?.registerUser) {
       router.push("/");
+    } else {
+      console.error("Received an error: ", response.error);
     }
   }
 
@@ -90,18 +96,3 @@ const Register: React.FC<RegisterProps> = ({}) => {
 };
 
 export default withUrqlClient(createUrqlClient)(Register);
-
-function addServerErrors<T>(
-  errors: FieldError[],
-  setError: (
-    fieldName: keyof T,
-    error: { type: string; message: string }
-  ) => void
-) {
-  return errors.forEach(({ field, message }) => {
-    setError(field as keyof T, {
-      type: "server",
-      message: message,
-    });
-  });
-}
