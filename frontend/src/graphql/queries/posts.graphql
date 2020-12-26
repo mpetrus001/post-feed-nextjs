@@ -3,6 +3,10 @@ query Posts($limit: Int!, $cursor: String) {
     hasMore
     posts {
       ...DefaultPost
+      creator {
+        id
+        username
+      }
     }
   }
 }

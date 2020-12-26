@@ -49,11 +49,13 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
   return (
     <>
       <Stack spacing={8} mb={8}>
-        {data?.posts.posts.map((post) =>
-          !post ? null : (
-            <Box key={post.id} p={4} shadow="md" borderWidth="1px">
-              <Heading fontSize="xl">{post.title}</Heading>
-              <Text mt={4}>{post.textSnippet}</Text>
+        {data?.posts.posts.map(({ id, title, textSnippet, creator }) =>
+          !id ? null : (
+            <Box key={id} p={4} shadow="md" borderWidth="1px">
+              <Text fontSize="sm">@{creator.username}</Text>
+              <Heading fontSize="xl">{title}</Heading>
+
+              <Text mt={4}>{textSnippet}</Text>
             </Box>
           )
         )}

@@ -54,6 +54,7 @@ export type Post = {
   text: Scalars['String'];
   points: Scalars['Float'];
   creatorId: Scalars['Float'];
+  creator: User;
   textSnippet: Scalars['String'];
 };
 
@@ -220,6 +221,10 @@ export type PostsQuery = (
     & Pick<PaginatedPosts, 'hasMore'>
     & { posts: Array<(
       { __typename?: 'Post' }
+      & { creator: (
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'username'>
+      ) }
       & DefaultPostFragment
     )> }
   ) }
@@ -321,6 +326,10 @@ export const PostsDocument = gql`
     hasMore
     posts {
       ...DefaultPost
+      creator {
+        id
+        username
+      }
     }
   }
 }

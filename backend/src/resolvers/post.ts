@@ -14,7 +14,7 @@ import {
   Root,
   UseMiddleware,
 } from "type-graphql";
-import { getConnection } from "typeorm";
+// import { getConnection } from "typeorm";
 import { Post } from "../entities/Post";
 import { requireAuth } from "../middleware/requireAuth";
 import { FieldError } from "./types";
@@ -43,31 +43,28 @@ export class PostResolver {
     return root.text.slice(0, 150);
   }
 
-  // borrowed from Ben Awad's lireddit
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
+    @Ctx() { orm: { PostRepository } }: MyContext
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit);
     const reaLimitPlusOne = realLimit + 1;
 
-    const replacements: any[] = [reaLimitPlusOne];
+    const postsQuery = await PostRepository.createQueryBuilder("post")
+      // typeorm orderBy expects property name, not column name
+      .orderBy("post.createdAt", "DESC")
+      .take(reaLimitPlusOne)
+      .leftJoinAndSelect("post.creator", "user");
 
     if (cursor) {
-      replacements.push(new Date(parseInt(cursor)));
+      postsQuery.where('post."createdAt" < :cursor', {
+        cursor: new Date(parseInt(cursor)),
+      });
     }
 
-    const posts = await getConnection().query(
-      `
-    select p.*
-    from post p
-    ${cursor ? `where p."createdAt" < $2` : ""}
-    order by p."createdAt" DESC
-    limit $1
-    `,
-      replacements
-    );
+    const posts = await postsQuery.getMany();
 
     return {
       posts: posts.slice(0, realLimit),
