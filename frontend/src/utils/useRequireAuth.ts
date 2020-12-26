@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useMeQuery } from "../generated/graphql";
-import { isServer } from "./_isServer";
+import { isServer } from "./isServer";
 
 const useRequireAuth = () => {
   const [{ data, fetching }] = useMeQuery({

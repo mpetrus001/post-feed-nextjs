@@ -3,7 +3,7 @@ import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
 import Layout from "../components/Layout";
 import { PostsQueryVariables, usePostsQuery } from "../generated/graphql";
-import createUrqlClient from "../utils/_createUrqlClient";
+import createUrqlClient from "../utils/createUrqlClient";
 
 interface IndexProps {}
 

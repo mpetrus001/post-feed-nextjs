@@ -7,7 +7,7 @@ import InputField from "../../components/InputField";
 import Layout from "../../components/Layout";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import { addServerErrors } from "../../utils/addServerErrors";
-import createUrqlClient from "../../utils/_createUrqlClient";
+import createUrqlClient from "../../utils/createUrqlClient";
 
 interface ChangePasswordProps {}
 
