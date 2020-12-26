@@ -6,10 +6,12 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Mutation,
   Query,
   Resolver,
+  Root,
   UseMiddleware,
 } from "type-graphql";
 import { COOKIE_NAME } from "../constants";
@@ -31,8 +33,15 @@ class UserInput {
 }
 
 // set up the GraphQL resolvers
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: MyContext): string {
+    // protects the user's email from access by other users
+    if (req.session.userId === user.id) return user.email;
+    return "";
+  }
+
   // checks to see if a user is logged in
   @Query(() => User, { nullable: true })
   async me(
