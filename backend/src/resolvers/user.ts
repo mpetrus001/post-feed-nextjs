@@ -285,21 +285,17 @@ export class UserResolver {
     // if all validation passes then proceed with reset
     // redis stores strings but postgres ids are type int
     const id = parseInt(storedId);
-    try {
-      const matchedUser = await UserRepository.findOne({ id });
-      if (!matchedUser)
-        throw new AuthenticationError(
-          "a valid token must be included in request"
-        );
-      const hash = await argon2.hash(password);
-      matchedUser.password = hash;
-      await UserRepository.save(matchedUser);
-      // remove the reset-password token from the session
-      redis.del(`reset-password-${token}`);
-      return matchedUser;
-    } catch (error) {
-      throw error;
-    }
+    const matchedUser = await UserRepository.findOne({ id });
+    if (!matchedUser)
+      throw new AuthenticationError(
+        "a valid token must be included in request"
+      );
+    const hash = await argon2.hash(password);
+    matchedUser.password = hash;
+    await UserRepository.save(matchedUser);
+    // remove the reset-password token from the session
+    redis.del(`reset-password-${token}`);
+    return matchedUser;
   }
 
   // @Mutation(() => User, { nullable: true })

@@ -16,6 +16,7 @@ import {
 import { MyContext } from "src/types";
 import { requireAuth } from "../middleware/requireAuth";
 import { FieldError } from "./types";
+import { UserInputError } from "apollo-server-express";
 
 @InputType()
 class PostInput {
@@ -24,16 +25,6 @@ class PostInput {
 
   @Field()
   text!: string;
-}
-
-@ObjectType()
-class PostResponse {
-  // Field defines what types show up in GraphQL
-  @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
-
-  @Field(() => Post, { nullable: true })
-  post?: Post | null;
 }
 
 @InputType()
@@ -107,57 +98,70 @@ export class PostResolver {
   }
 
   @Query(() => Post, { nullable: true })
-  post(
+  async post(
     @Arg("id") id: number,
     @Ctx() { orm: { PostRepository } }: MyContext
-  ): Promise<Post | undefined> {
-    return PostRepository.findOne({ id });
+  ): Promise<Post | null> {
+    const post = await PostRepository.findOne({ id });
+    if (!post) return null;
+    return post;
   }
 
-  @Mutation(() => PostResponse)
+  @Mutation(() => Post)
   @UseMiddleware(requireAuth) // will throw if user session doesn't exist
   async createPost(
     @Arg("postInput") postInput: PostInput,
     @Ctx() { orm: { PostRepository }, req }: MyContext
-  ): Promise<PostResponse> {
+  ): Promise<Post> {
+    // validate each of the inputs
+    // structured in a way to add other validation later
+    let errors: FieldError[] = [];
     if (postInput.title.length < 1)
-      return {
-        errors: [
-          {
-            field: "title",
-            message: "title must be at least 2 chars",
-          },
-        ],
-      };
+      errors.push({
+        field: "title",
+        message: "title must be at least 1 char",
+      });
+    if (errors.length > 0) {
+      let fields = errors.reduce(
+        (acc, error) => [...acc, error.field],
+        [] as string[]
+      );
+      throw new UserInputError(
+        `${JSON.stringify(fields)} did not pass format validation`,
+        {
+          fieldErrors: errors,
+        }
+      );
+    }
 
     const newPost = await PostRepository.create({
       ...postInput,
       creatorId: req.session.userId,
     });
     await PostRepository.save(newPost);
-    return { post: newPost };
+    return newPost;
   }
 
-  @Mutation(() => Post, { nullable: true })
-  async updatePost(
-    @Arg("id") id: number,
-    @Arg("title") title: string,
-    @Ctx() { orm: { PostRepository } }: MyContext
-  ): Promise<Post | null> {
-    const matchedPost = await PostRepository.findOne({ id });
-    if (!matchedPost) return null;
-    matchedPost.title = title;
-    await PostRepository.save(matchedPost);
-    return matchedPost;
-  }
+  // @Mutation(() => Post, { nullable: true })
+  // async updatePost(
+  //   @Arg("id") id: number,
+  //   @Arg("title") title: string,
+  //   @Ctx() { orm: { PostRepository } }: MyContext
+  // ): Promise<Post | null> {
+  //   const matchedPost = await PostRepository.findOne({ id });
+  //   if (!matchedPost) return null;
+  //   matchedPost.title = title;
+  //   await PostRepository.save(matchedPost);
+  //   return matchedPost;
+  // }
 
-  @Mutation(() => Boolean)
-  async deletePost(
-    @Arg("id") id: number,
-    @Ctx() { orm: { PostRepository } }: MyContext
-  ): Promise<boolean> {
-    const { affected } = await PostRepository.delete({ id });
-    if (affected && affected > 0) return true;
-    return false;
-  }
+  // @Mutation(() => Boolean)
+  // async deletePost(
+  //   @Arg("id") id: number,
+  //   @Ctx() { orm: { PostRepository } }: MyContext
+  // ): Promise<boolean> {
+  //   const { affected } = await PostRepository.delete({ id });
+  //   if (affected && affected > 0) return true;
+  //   return false;
+  // }
 }
