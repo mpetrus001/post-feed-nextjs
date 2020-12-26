@@ -1,9 +1,0 @@
-fragment DefaultUserResponse on UserResponse {
-  errors {
-    field
-    message
-  }
-  user {
-    ...DefaultUser
-  }
-}

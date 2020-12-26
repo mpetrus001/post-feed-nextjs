@@ -1,5 +1,5 @@
 mutation CreatePost($postInput: PostInput!) {
   createPost(postInput: $postInput) {
-    ...DefaultPostResponse
+    ...DefaultPost
   }
 }

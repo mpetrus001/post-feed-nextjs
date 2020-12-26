@@ -1,9 +1,0 @@
-fragment DefaultPostResponse on PostResponse {
-  errors {
-    field
-    message
-  }
-  post {
-    ...DefaultPost
-  }
-}

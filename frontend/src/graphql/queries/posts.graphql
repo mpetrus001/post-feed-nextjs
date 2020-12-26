@@ -1,0 +1,12 @@
+query Posts($pageInfo: PageInfoInput!) {
+  posts(pageInfo: $pageInfo) {
+    pageInfo {
+      hasNextPage
+      limit
+      cursor
+    }
+    posts {
+      ...DefaultPost
+    }
+  }
+}

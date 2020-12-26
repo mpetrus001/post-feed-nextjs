@@ -1,5 +1,5 @@
-mutation RegisterUser($username: String!, $email: String!, $password: String!) {
-  registerUser(username: $username, email: $email, password: $password) {
-    ...DefaultUserResponse
+mutation RegisterUser($userInput: UserInput!) {
+  registerUser(userInput: $userInput) {
+    ...DefaultUser
   }
 }
