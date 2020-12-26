@@ -1,4 +1,5 @@
 import { UserInputError } from "apollo-server-express";
+import { UpVote } from "../entities/UpVote";
 import { MyContext } from "src/types";
 import {
   Arg,
@@ -41,6 +42,31 @@ export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
     return root.text.slice(0, 150);
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(requireAuth)
+  async vote(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() { req, orm: { PostRepository } }: MyContext
+  ): Promise<boolean> {
+    try {
+      value = value > 0 ? 1 : -1;
+      await UpVote.insert({
+        postId,
+        userId: req.session.userId,
+        value,
+      });
+      if (value > 0) {
+        await PostRepository.increment({ id: postId }, "points", 1);
+      } else {
+        await PostRepository.decrement({ id: postId }, "points", 1);
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   @Query(() => PaginatedPosts)
