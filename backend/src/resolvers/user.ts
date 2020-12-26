@@ -1,23 +1,22 @@
-import { User } from "../entities/User";
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Ctx,
-  Arg,
-  ObjectType,
-  Field,
-  UseMiddleware,
-  InputType,
-} from "type-graphql";
-import { MyContext } from "src/types";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import argon2 from "argon2";
 import { nanoid } from "nanoid";
+import { MyContext } from "src/types";
+import {
+  Arg,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { COOKIE_NAME } from "../constants";
+import { User } from "../entities/User";
+import { requireAuth } from "../middleware/requireAuth";
 import { sendEmail } from "../utils/sendEmail";
 import { FieldError } from "./types";
-import { requireAuth } from "../middleware/requireAuth";
-import { AuthenticationError, UserInputError } from "apollo-server-express";
 
 @InputType()
 class UserInput {

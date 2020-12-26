@@ -36,6 +36,39 @@ class PostResponse {
   post?: Post | null;
 }
 
+@InputType()
+class PageInfoInput {
+  @Field(() => Boolean, { nullable: true })
+  hasNextPage?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  limit?: number;
+
+  @Field(() => String, { nullable: true })
+  cursor?: string;
+}
+
+@ObjectType()
+class PageInfoOutput {
+  @Field(() => Boolean)
+  hasNextPage: boolean;
+
+  @Field(() => Int)
+  limit: number;
+
+  @Field(() => String)
+  cursor: string;
+}
+
+@ObjectType()
+class PaginatedPosts {
+  @Field(() => [Post])
+  posts: Post[];
+
+  @Field(() => PageInfoOutput)
+  pageInfo: PageInfoOutput;
+}
+
 @Resolver(Post)
 export class PostResolver {
   @FieldResolver(() => String)
@@ -43,22 +76,34 @@ export class PostResolver {
     return root.text.slice(0, 150);
   }
 
-  @Query(() => [Post])
+  @Query(() => PaginatedPosts)
   async posts(
     @Ctx() { orm: { PostRepository } }: MyContext,
-    @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
-  ): Promise<Post[]> {
-    const serverLimit = Math.min(50, limit);
-    const postsQuery = await PostRepository.createQueryBuilder("posts")
+    @Arg("pageInfo", () => PageInfoInput)
+    pageInfo: PageInfoInput
+  ): Promise<PaginatedPosts> {
+    const limit = pageInfo.limit ?? 10;
+    const cursor = pageInfo.cursor ?? Date.now().toString();
+    const serverLimit = Math.min(50, limit) + 1;
+    const posts = await PostRepository.createQueryBuilder("posts")
       // double quote due to postgres being case sensitive
       .orderBy('"createdAt"', "DESC")
-      .take(serverLimit);
-    if (cursor)
-      postsQuery.where('"createdAt" < :cursor', {
+      .take(serverLimit)
+      .where('"createdAt" < :cursor', {
         cursor: new Date(parseInt(cursor)),
-      });
-    return postsQuery.getMany();
+      })
+      .getMany();
+
+    return {
+      // slice to remove the extra added for hasNextPage
+      posts: posts.slice(0, serverLimit - 1),
+      pageInfo: {
+        hasNextPage: posts.length === serverLimit,
+        limit,
+        // convert the Date back to an int, then to a string
+        cursor: posts[posts.length - 1].createdAt.valueOf().toString(),
+      },
+    };
   }
 
   @Query(() => Post, { nullable: true })
