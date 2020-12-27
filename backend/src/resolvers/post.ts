@@ -51,18 +51,42 @@ export class PostResolver {
     @Arg("value", () => Int) value: number,
     @Ctx() { req, orm: { PostRepository } }: MyContext
   ): Promise<boolean> {
+    value = value > 0 ? 1 : -1;
     try {
-      value = value > 0 ? 1 : -1;
-      await UpVote.insert({
+      const currentVote = await UpVote.findOne({
         postId,
         userId: req.session.userId,
-        value,
       });
-      if (value > 0) {
-        await PostRepository.increment({ id: postId }, "points", 1);
-      } else {
+      if (!currentVote) {
+        const newVote = UpVote.create({
+          postId,
+          userId: req.session.userId,
+          value,
+        });
+        if (value < 0) {
+          await PostRepository.decrement({ id: postId }, "points", 1);
+        }
+        if (value > 0) {
+          await PostRepository.increment({ id: postId }, "points", 1);
+        }
+        await UpVote.save(newVote);
+        return true;
+      }
+
+      // my current vote is up and I change it to up: do nothing
+      if (currentVote.value > 0 && value > 0) return true;
+      // my current vote is down and I change it to down: do nothing
+      if (currentVote.value < 0 && value < 0) return true;
+      // my current vote is up and I send down: remove one point
+      if (currentVote.value >= 0 && value < 0) {
         await PostRepository.decrement({ id: postId }, "points", 1);
       }
+      // my current vote is down and I send up: add one point
+      if (currentVote.value <= 0 && value > 0) {
+        await PostRepository.increment({ id: postId }, "points", 1);
+      }
+      currentVote.value = currentVote.value + value;
+      await UpVote.save(currentVote);
       return true;
     } catch (error) {
       return false;
