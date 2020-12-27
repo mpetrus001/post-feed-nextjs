@@ -1,8 +1,13 @@
 import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { BiDownvote, BiUpvote } from "react-icons/bi";
 import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
 import Layout from "../components/Layout";
-import { PostsQueryVariables, usePostsQuery } from "../generated/graphql";
+import {
+  PostsQueryVariables,
+  usePostsQuery,
+  useVoteMutation,
+} from "../generated/graphql";
 import createUrqlClient from "../utils/createUrqlClient";
 
 interface IndexProps {}
@@ -46,16 +51,42 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
   const [{ data, fetching }] = usePostsQuery({
     variables,
   });
+  const [, vote] = useVoteMutation();
   return (
     <>
       <Stack spacing={8} mb={8}>
-        {data?.posts.posts.map(({ id, title, textSnippet, creator }) =>
+        {data?.posts.posts.map(({ id, title, textSnippet, creator, points }) =>
           !id ? null : (
             <Box key={id} p={4} shadow="md" borderWidth="1px">
               <Text fontSize="sm">@{creator.username}</Text>
               <Heading fontSize="xl">{title}</Heading>
-
               <Text mt={4}>{textSnippet}</Text>
+              <Flex
+                mt={2}
+                justifyContent="flex-end"
+                alignItems="center"
+                alignContent="center"
+              >
+                <Button
+                  rightIcon={<BiDownvote />}
+                  colorScheme="purple"
+                  size="sm"
+                  iconSpacing={0.75}
+                  height={5}
+                  width={1}
+                  onClick={() => vote({ postId: id, value: -1 })}
+                ></Button>
+                <Text mx={2}>{points}</Text>
+                <Button
+                  leftIcon={<BiUpvote />}
+                  colorScheme="purple"
+                  size="sm"
+                  iconSpacing={0.75}
+                  height={5}
+                  width={1}
+                  onClick={() => vote({ postId: id, value: 1 })}
+                ></Button>
+              </Flex>
             </Box>
           )
         )}

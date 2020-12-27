@@ -1,6 +1,6 @@
 import { Cache, cacheExchange, QueryInput } from "@urql/exchange-graphcache";
 import Router from "next/router";
-import { dedupExchange, Exchange, fetchExchange } from "urql";
+import { dedupExchange, Exchange, fetchExchange, gql } from "urql";
 import { pipe, tap } from "wonka";
 import {
   LoginUserMutation,
@@ -77,6 +77,31 @@ const createUrqlClient = (ssrExchange: any) => ({
               }
             );
           },
+          createPost: (_result, args, cache, info) => {
+            cache.invalidate("Query", "posts", { limit: 15 });
+          },
+          // vote: (_result, args, cache, info) => {
+          // 	// TODO fix this to have proper optimistic update
+          //   const postFragment = cache.readFragment(
+          //     gql`
+          //       fragment _ on Post {
+          //         id
+          //         points
+          //       }
+          //     `,
+          //     { id: args.postId }
+          //   );
+
+          //   cache.writeFragment(
+          //     gql`
+          //       fragment _ on Post {
+          //         id
+          //         points
+          //       }
+          //     `,
+          //     { id: args.postId, points: postFragment.points + args.value }
+          //   );
+          // },
         },
       },
     }),

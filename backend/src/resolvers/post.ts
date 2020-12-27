@@ -122,27 +122,6 @@ export class PostResolver {
     };
   }
 
-  // @Query(() => [Post])
-  // async posts(
-  //   @Ctx() { orm: { PostRepository } }: MyContext,
-  //   @Arg("skip", () => Int, { nullable: true })
-  //   skip?: number,
-  //   @Arg("take", () => Int, { nullable: true })
-  //   take?: number
-  // ): Promise<Post[]> {
-  //   skip = skip ?? 0;
-  //   take = take ?? 10;
-  //   const serverLimit = Math.min(50, take);
-  //   const posts = await PostRepository.createQueryBuilder("posts")
-  //     // double quote due to postgres being case sensitive
-  //     .orderBy('"createdAt"', "DESC")
-  //     .skip(skip)
-  //     .take(serverLimit)
-  //     .getMany();
-
-  //   return posts;
-  // }
-
   @Query(() => Post, { nullable: true })
   async post(
     @Arg("id") id: number,

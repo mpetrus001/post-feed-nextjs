@@ -8,6 +8,7 @@ import {
   Field,
   FieldResolver,
   InputType,
+  Int,
   Mutation,
   Query,
   Resolver,
@@ -65,7 +66,7 @@ export class UserResolver {
   @Query(() => User, { nullable: true })
   @UseMiddleware(requireAuth)
   async user(
-    @Arg("id") id: number,
+    @Arg("id", () => Int) id: number,
     @Ctx() { orm: { UserRepository } }: MyContext
   ): Promise<User | null> {
     const user = await UserRepository.findOne({ id });

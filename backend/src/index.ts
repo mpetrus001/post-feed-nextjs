@@ -65,7 +65,7 @@ const main = async () => {
     }),
     // context is available in each resolver
     context: ({ req, res }): MyContext => ({
-      orm: { UserRepository, PostRepository },
+      orm: { DB: dbConnection, UserRepository, PostRepository },
       redis: redisClient,
       req,
       res,

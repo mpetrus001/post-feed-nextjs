@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Redis from "ioredis";
-import { Repository } from "typeorm";
+import { Connection, Repository } from "typeorm";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 
@@ -18,6 +18,7 @@ declare module "express-session" {
 }
 
 type MyOrm = {
+  DB: Connection;
   UserRepository: Repository<User>;
   PostRepository: Repository<Post>;
 };
