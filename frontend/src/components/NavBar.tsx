@@ -27,7 +27,9 @@ const NavBar: React.FC<NavBarProps> = ({ showUser = true }) => {
       color={"whitesmoke"}
       mb={4}
     >
-      <Heading>Reddit-Clone</Heading>
+      <NextLink href="/">
+        <Heading cursor="pointer">Reddit-Clone</Heading>
+      </NextLink>
       {!showUser || !!meFetching ? null : meData?.me ? (
         <Flex>
           <Text>{meData.me.username}</Text>

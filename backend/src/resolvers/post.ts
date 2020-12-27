@@ -109,7 +109,7 @@ export class PostResolver {
       .leftJoinAndSelect("post.creator", "user");
 
     if (cursor) {
-      postsQuery.where('post."createdAt" < :cursor', {
+      postsQuery.where("post.createdAt < :cursor", {
         cursor: new Date(parseInt(cursor)),
       });
     }

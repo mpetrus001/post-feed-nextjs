@@ -1,4 +1,12 @@
-import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { BiDownvote, BiUpvote } from "react-icons/bi";
 import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
@@ -7,6 +15,7 @@ import {
   PostsQueryVariables,
   usePostsQuery,
   useVoteMutation,
+  VoteMutationVariables,
 } from "../generated/graphql";
 import createUrqlClient from "../utils/createUrqlClient";
 
@@ -51,7 +60,17 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
   const [{ data, fetching }] = usePostsQuery({
     variables,
   });
-  const [, vote] = useVoteMutation();
+  const [{ fetching: voteFetching }, vote] = useVoteMutation();
+
+  const [currentVoteVars, setCurrentVoteVars] = useState<
+    Partial<VoteMutationVariables>
+  >({});
+
+  const submitVote = ({ postId, value }: VoteMutationVariables) => {
+    setCurrentVoteVars({ postId, value });
+    vote({ postId, value });
+  };
+
   return (
     <>
       <Stack spacing={8} mb={8}>
@@ -61,31 +80,35 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
               <Text fontSize="sm">@{creator.username}</Text>
               <Heading fontSize="xl">{title}</Heading>
               <Text mt={4}>{textSnippet}</Text>
-              <Flex
-                mt={2}
-                justifyContent="flex-end"
-                alignItems="center"
-                alignContent="center"
-              >
-                <Button
-                  rightIcon={<BiDownvote />}
+              <Flex mt={4} alignItems="center" alignContent="center">
+                <IconButton
+                  icon={<BiDownvote />}
+                  variant="outline"
                   colorScheme="purple"
-                  size="sm"
-                  iconSpacing={0.75}
-                  height={5}
-                  width={1}
-                  onClick={() => vote({ postId: id, value: -1 })}
-                ></Button>
+                  size="xs"
+                  aria-label="down vote"
+                  // TODO implement ui feedback on vote result
+                  onClick={() => submitVote({ postId: id, value: -1 })}
+                  isLoading={
+                    voteFetching &&
+                    currentVoteVars.postId == id &&
+                    currentVoteVars.value == -1
+                  }
+                ></IconButton>
                 <Text mx={2}>{points}</Text>
-                <Button
-                  leftIcon={<BiUpvote />}
+                <IconButton
+                  icon={<BiUpvote />}
+                  variant="outline"
                   colorScheme="purple"
-                  size="sm"
-                  iconSpacing={0.75}
-                  height={5}
-                  width={1}
-                  onClick={() => vote({ postId: id, value: 1 })}
-                ></Button>
+                  size="xs"
+                  aria-label="up vote"
+                  onClick={() => submitVote({ postId: id, value: 1 })}
+                  isLoading={
+                    voteFetching &&
+                    currentVoteVars.postId == id &&
+                    currentVoteVars.value == 1
+                  }
+                ></IconButton>
               </Flex>
             </Box>
           )
