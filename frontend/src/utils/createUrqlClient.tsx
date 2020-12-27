@@ -80,28 +80,30 @@ const createUrqlClient = (ssrExchange: any) => ({
           createPost: (_result, args, cache, info) => {
             cache.invalidate("Query", "posts", { limit: 15 });
           },
-          // vote: (_result, args, cache, info) => {
-          // 	// TODO fix this to have proper optimistic update
-          //   const postFragment = cache.readFragment(
-          //     gql`
-          //       fragment _ on Post {
-          //         id
-          //         points
-          //       }
-          //     `,
-          //     { id: args.postId }
-          //   );
+          vote: (result, args, cache, info) => {
+            if (result.vote) {
+              // if the vote change was applied to the post then update cache
+              const postFragment = cache.readFragment(
+                gql`
+                  fragment _ on Post {
+                    id
+                    points
+                  }
+                `,
+                { id: args.postId }
+              );
 
-          //   cache.writeFragment(
-          //     gql`
-          //       fragment _ on Post {
-          //         id
-          //         points
-          //       }
-          //     `,
-          //     { id: args.postId, points: postFragment.points + args.value }
-          //   );
-          // },
+              cache.writeFragment(
+                gql`
+                  fragment _ on Post {
+                    id
+                    points
+                  }
+                `,
+                { id: args.postId, points: postFragment.points + args.value }
+              );
+            }
+          },
         },
       },
     }),

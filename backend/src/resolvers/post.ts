@@ -74,9 +74,9 @@ export class PostResolver {
       }
 
       // my current vote is up and I change it to up: do nothing
-      if (currentVote.value > 0 && value > 0) return true;
+      if (currentVote.value > 0 && value > 0) return false;
       // my current vote is down and I change it to down: do nothing
-      if (currentVote.value < 0 && value < 0) return true;
+      if (currentVote.value < 0 && value < 0) return false;
       // my current vote is up and I send down: remove one point
       if (currentVote.value >= 0 && value < 0) {
         await PostRepository.decrement({ id: postId }, "points", 1);
