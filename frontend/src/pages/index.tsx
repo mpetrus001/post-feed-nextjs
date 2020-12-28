@@ -18,6 +18,7 @@ import {
   VoteMutationVariables,
 } from "../generated/graphql";
 import createUrqlClient from "../utils/createUrqlClient";
+import NextLink from "next/link";
 
 interface IndexProps {}
 
@@ -79,7 +80,15 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
             !id ? null : (
               <Box key={id} p={4} shadow="md" borderWidth="1px">
                 <Text fontSize="sm">@{creator.username}</Text>
-                <Heading fontSize="xl">{title}</Heading>
+                <NextLink href={`/post/${id}`}>
+                  <Heading
+                    fontSize="xl"
+                    cursor="pointer"
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    {title}
+                  </Heading>
+                </NextLink>
                 <Text mt={4}>{textSnippet}</Text>
                 <Flex mt={4} alignItems="center" alignContent="center">
                   <IconButton

@@ -129,7 +129,7 @@ export class PostResolver {
 
   @Query(() => Post, { nullable: true })
   async post(
-    @Arg("id") id: number,
+    @Arg("id", () => Int) id: number,
     @Ctx() { orm: { PostRepository } }: MyContext
   ): Promise<Post | null> {
     const post = await PostRepository.findOne({ id });
