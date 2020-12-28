@@ -39,6 +39,9 @@ export class Post extends BaseEntity {
   @Column({ type: "int", default: 0 })
   points!: number;
 
+  @Field(() => UpVote, { nullable: true })
+  vote: UpVote;
+
   @OneToMany(() => UpVote, (upvote) => upvote.post)
   upvotes: UpVote[];
 

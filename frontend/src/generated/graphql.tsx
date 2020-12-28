@@ -53,9 +53,17 @@ export type Post = {
   title: Scalars['String'];
   text: Scalars['String'];
   points: Scalars['Float'];
+  vote?: Maybe<UpVote>;
   creatorId: Scalars['Float'];
   creator: User;
   textSnippet: Scalars['String'];
+};
+
+export type UpVote = {
+  __typename?: 'UpVote';
+  user: User;
+  post: Post;
+  value: Scalars['Float'];
 };
 
 export type User = {
@@ -242,7 +250,10 @@ export type PostsQuery = (
       & { creator: (
         { __typename?: 'User' }
         & Pick<User, 'id' | 'username'>
-      ) }
+      ), vote?: Maybe<(
+        { __typename?: 'UpVote' }
+        & Pick<UpVote, 'value'>
+      )> }
       & DefaultPostFragment
     )> }
   ) }
@@ -356,6 +367,9 @@ export const PostsDocument = gql`
       creator {
         id
         username
+      }
+      vote {
+        value
       }
     }
   }

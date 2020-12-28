@@ -32,6 +32,7 @@ const createUrqlClient = (ssrExchange: any) => ({
     cacheExchange({
       keys: {
         PaginatedPosts: () => null,
+        UpVote: () => null,
       },
       updates: {
         Mutation: {
@@ -88,19 +89,35 @@ const createUrqlClient = (ssrExchange: any) => ({
                   fragment _ on Post {
                     id
                     points
+                    vote {
+                      value
+                    }
                   }
                 `,
                 { id: args.postId }
               );
 
+              console.log(postFragment);
               cache.writeFragment(
                 gql`
                   fragment _ on Post {
                     id
                     points
+                    vote {
+                      value
+                    }
                   }
                 `,
-                { id: args.postId, points: postFragment.points + args.value }
+                {
+                  id: args.postId,
+                  points: postFragment.points + args.value,
+                  vote: postFragment.vote
+                    ? {
+                        __typename: "UpVote",
+                        value: postFragment.vote.value + args.value,
+                      }
+                    : { __typename: "UpVote", value: args.value },
+                }
               );
             }
           },

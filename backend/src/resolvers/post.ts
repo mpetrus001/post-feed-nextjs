@@ -52,52 +52,47 @@ export class PostResolver {
     @Ctx() { req, orm: { PostRepository } }: MyContext
   ): Promise<boolean> {
     value = value > 0 ? 1 : -1;
-    try {
-      const currentVote = await UpVote.findOne({
+    const currentVote = await UpVote.findOne({
+      postId,
+      userId: req.session.userId,
+    });
+    if (!currentVote) {
+      const newVote = UpVote.create({
         postId,
         userId: req.session.userId,
+        value,
       });
-      if (!currentVote) {
-        const newVote = UpVote.create({
-          postId,
-          userId: req.session.userId,
-          value,
-        });
-        if (value < 0) {
-          await PostRepository.decrement({ id: postId }, "points", 1);
-        }
-        if (value > 0) {
-          await PostRepository.increment({ id: postId }, "points", 1);
-        }
-        await UpVote.save(newVote);
-        return true;
-      }
-
-      // my current vote is up and I change it to up: do nothing
-      if (currentVote.value > 0 && value > 0) return false;
-      // my current vote is down and I change it to down: do nothing
-      if (currentVote.value < 0 && value < 0) return false;
-      // my current vote is up and I send down: remove one point
-      if (currentVote.value >= 0 && value < 0) {
+      if (value < 0) {
         await PostRepository.decrement({ id: postId }, "points", 1);
-      }
-      // my current vote is down and I send up: add one point
-      if (currentVote.value <= 0 && value > 0) {
+      } else {
         await PostRepository.increment({ id: postId }, "points", 1);
       }
-      currentVote.value = currentVote.value + value;
-      await UpVote.save(currentVote);
+      await UpVote.save(newVote);
       return true;
-    } catch (error) {
-      return false;
     }
+
+    // my current vote is up and I change it to up: do nothing
+    if (currentVote.value > 0 && value > 0) return false;
+    // my current vote is down and I change it to down: do nothing
+    if (currentVote.value < 0 && value < 0) return false;
+    // my current vote is up and I send down: remove one point
+    if (currentVote.value >= 0 && value < 0) {
+      await PostRepository.decrement({ id: postId }, "points", 1);
+    }
+    // my current vote is down and I send up: add one point
+    if (currentVote.value <= 0 && value > 0) {
+      await PostRepository.increment({ id: postId }, "points", 1);
+    }
+    currentVote.value = currentVote.value + value;
+    await UpVote.save(currentVote);
+    return true;
   }
 
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
-    @Ctx() { orm: { PostRepository } }: MyContext
+    @Ctx() { req, orm: { PostRepository } }: MyContext
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit);
     const reaLimitPlusOne = realLimit + 1;
@@ -107,6 +102,16 @@ export class PostResolver {
       .orderBy("post.createdAt", "DESC")
       .take(reaLimitPlusOne)
       .leftJoinAndSelect("post.creator", "user");
+
+    if (req.session.userId) {
+      postsQuery.leftJoinAndMapOne(
+        "post.vote",
+        "post.upvotes",
+        "vote",
+        "vote.userId = :userId",
+        { userId: req.session.userId }
+      );
+    }
 
     if (cursor) {
       postsQuery.where("post.createdAt < :cursor", {

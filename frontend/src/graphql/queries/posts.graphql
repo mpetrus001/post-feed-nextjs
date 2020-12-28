@@ -7,6 +7,9 @@ query Posts($limit: Int!, $cursor: String) {
         id
         username
       }
+      vote {
+        value
+      }
     }
   }
 }

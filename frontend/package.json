@@ -25,6 +25,7 @@
     "@chakra-ui/react": "^1.0.0",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
+    "@urql/devtools": "^2.0.2",
     "@urql/exchange-graphcache": "^3.3.3",
     "framer-motion": "^2.9.4",
     "graphql": "^15.4.0",

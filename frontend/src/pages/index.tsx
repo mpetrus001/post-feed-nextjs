@@ -74,44 +74,45 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
   return (
     <>
       <Stack spacing={8} mb={8}>
-        {data?.posts.posts.map(({ id, title, textSnippet, creator, points }) =>
-          !id ? null : (
-            <Box key={id} p={4} shadow="md" borderWidth="1px">
-              <Text fontSize="sm">@{creator.username}</Text>
-              <Heading fontSize="xl">{title}</Heading>
-              <Text mt={4}>{textSnippet}</Text>
-              <Flex mt={4} alignItems="center" alignContent="center">
-                <IconButton
-                  icon={<BiDownvote />}
-                  variant="outline"
-                  colorScheme="purple"
-                  size="xs"
-                  aria-label="down vote"
-                  // TODO implement ui feedback on vote result
-                  onClick={() => submitVote({ postId: id, value: -1 })}
-                  isLoading={
-                    voteFetching &&
-                    currentVoteVars.postId == id &&
-                    currentVoteVars.value == -1
-                  }
-                ></IconButton>
-                <Text mx={2}>{points}</Text>
-                <IconButton
-                  icon={<BiUpvote />}
-                  variant="outline"
-                  colorScheme="purple"
-                  size="xs"
-                  aria-label="up vote"
-                  onClick={() => submitVote({ postId: id, value: 1 })}
-                  isLoading={
-                    voteFetching &&
-                    currentVoteVars.postId == id &&
-                    currentVoteVars.value == 1
-                  }
-                ></IconButton>
-              </Flex>
-            </Box>
-          )
+        {data?.posts.posts.map(
+          ({ id, title, textSnippet, creator, points, vote }) =>
+            !id ? null : (
+              <Box key={id} p={4} shadow="md" borderWidth="1px">
+                <Text fontSize="sm">@{creator.username}</Text>
+                <Heading fontSize="xl">{title}</Heading>
+                <Text mt={4}>{textSnippet}</Text>
+                <Flex mt={4} alignItems="center" alignContent="center">
+                  <IconButton
+                    icon={<BiDownvote />}
+                    variant="outline"
+                    colorScheme={vote?.value == -1 ? "red" : "purple"}
+                    size="xs"
+                    aria-label="down vote"
+                    // TODO implement ui feedback on vote result
+                    onClick={() => submitVote({ postId: id, value: -1 })}
+                    isLoading={
+                      voteFetching &&
+                      currentVoteVars.postId == id &&
+                      currentVoteVars.value == -1
+                    }
+                  ></IconButton>
+                  <Text mx={2}>{points}</Text>
+                  <IconButton
+                    icon={<BiUpvote />}
+                    variant="outline"
+                    colorScheme={vote?.value == 1 ? "green" : "purple"}
+                    size="xs"
+                    aria-label="up vote"
+                    onClick={() => submitVote({ postId: id, value: 1 })}
+                    isLoading={
+                      voteFetching &&
+                      currentVoteVars.postId == id &&
+                      currentVoteVars.value == 1
+                    }
+                  ></IconButton>
+                </Flex>
+              </Box>
+            )
         )}
       </Stack>
       {(isLastPage && fetching) || (isLastPage && data?.posts.hasMore) ? (
@@ -136,4 +137,4 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default withUrqlClient(createUrqlClient)(Index);
