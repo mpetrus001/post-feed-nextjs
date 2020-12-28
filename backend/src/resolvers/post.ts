@@ -185,13 +185,17 @@ export class PostResolver {
   //   return matchedPost;
   // }
 
-  // @Mutation(() => Boolean)
-  // async deletePost(
-  //   @Arg("id") id: number,
-  //   @Ctx() { orm: { PostRepository } }: MyContext
-  // ): Promise<boolean> {
-  //   const { affected } = await PostRepository.delete({ id });
-  //   if (affected && affected > 0) return true;
-  //   return false;
-  // }
+  @Mutation(() => Boolean)
+  @UseMiddleware(requireAuth)
+  async deletePost(
+    @Arg("id", () => Int) id: number,
+    @Ctx() { req, orm: { PostRepository } }: MyContext
+  ): Promise<boolean> {
+    const { affected } = await PostRepository.delete({
+      id,
+      creatorId: req.session.userId,
+    });
+    if (affected && affected > 0) return true;
+    return false;
+  }
 }

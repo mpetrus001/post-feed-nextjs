@@ -10,7 +10,7 @@ const Layout: React.FC<LayoutProps> = ({ children, showUser = true }) => {
   return (
     <Box mx="auto" w="100%">
       {showUser ? <NavBar /> : <NavBar showUser={false} />}
-      <Container>{children}</Container>
+      {children}
     </Box>
   );
 };

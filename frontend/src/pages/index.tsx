@@ -74,13 +74,13 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
 
   return (
     <>
-      <Stack spacing={8} mb={8}>
+      <Stack spacing={6} mb={6} px={2}>
         {data?.posts.posts.map(
           ({ id, title, textSnippet, creator, points, vote }) =>
             !id ? null : (
               <Box key={id} p={4} shadow="md" borderWidth="1px">
                 <Text fontSize="sm">@{creator.username}</Text>
-                <NextLink href={`/post/${id}`}>
+                <NextLink href="/post/[id]" as={`/post/${id}`}>
                   <Heading
                     fontSize="xl"
                     cursor="pointer"
@@ -89,7 +89,7 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
                     {title}
                   </Heading>
                 </NextLink>
-                <Text mt={4}>{textSnippet}</Text>
+                <Text mt={2}>{textSnippet}</Text>
                 <Flex mt={4} alignItems="center" alignContent="center">
                   <IconButton
                     icon={<BiDownvote />}
