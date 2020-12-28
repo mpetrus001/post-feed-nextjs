@@ -3,6 +3,8 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  InputGroup,
+  InputLeftAddon,
   Link,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
@@ -19,20 +21,23 @@ const InputField: React.FC<InputFieldProps> = ({
     return (
       <FormControl isInvalid={!!errors[label]}>
         <FormLabel htmlFor={label}>{label}</FormLabel>
-        <Input
-          name={label}
-          placeholder={label}
-          ref={register({
-            required: {
-              value: true,
-              message: "Username is required",
-            },
-            minLength: {
-              value: 2,
-              message: "Minimum length is 2",
-            },
-          })}
-        />
+        <InputGroup>
+          <InputLeftAddon children="@" />
+          <Input
+            name={label}
+            placeholder={label}
+            ref={register({
+              required: {
+                value: true,
+                message: "Username is required",
+              },
+              minLength: {
+                value: 2,
+                message: "Minimum length is 2",
+              },
+            })}
+          />
+        </InputGroup>
         <FormErrorMessage>
           {!!errors[label] && errors[label].message}
         </FormErrorMessage>

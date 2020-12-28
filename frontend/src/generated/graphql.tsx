@@ -79,6 +79,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   vote: Scalars['Boolean'];
   createPost: Post;
+  updatePost?: Maybe<Post>;
   deletePost: Scalars['Boolean'];
   registerUser: User;
   loginUser: User;
@@ -96,6 +97,12 @@ export type MutationVoteArgs = {
 
 export type MutationCreatePostArgs = {
   postInput: PostInput;
+};
+
+
+export type MutationUpdatePostArgs = {
+  postInput: PostInput;
+  id: Scalars['Int'];
 };
 
 
@@ -126,8 +133,8 @@ export type MutationChangePasswordArgs = {
 };
 
 export type PostInput = {
-  title: Scalars['String'];
-  text: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
+  text?: Maybe<Scalars['String']>;
 };
 
 export type UserInput = {
@@ -226,6 +233,20 @@ export type ResetPasswordMutationVariables = Exact<{
 export type ResetPasswordMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'resetPassword'>
+);
+
+export type UpdatePostMutationVariables = Exact<{
+  id: Scalars['Int'];
+  postInput: PostInput;
+}>;
+
+
+export type UpdatePostMutation = (
+  { __typename?: 'Mutation' }
+  & { updatePost?: Maybe<(
+    { __typename?: 'Post' }
+    & DefaultPostFragment
+  )> }
 );
 
 export type VoteMutationVariables = Exact<{
@@ -376,6 +397,17 @@ export const ResetPasswordDocument = gql`
 
 export function useResetPasswordMutation() {
   return Urql.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument);
+};
+export const UpdatePostDocument = gql`
+    mutation UpdatePost($id: Int!, $postInput: PostInput!) {
+  updatePost(id: $id, postInput: $postInput) {
+    ...DefaultPost
+  }
+}
+    ${DefaultPostFragmentDoc}`;
+
+export function useUpdatePostMutation() {
+  return Urql.useMutation<UpdatePostMutation, UpdatePostMutationVariables>(UpdatePostDocument);
 };
 export const VoteDocument = gql`
     mutation Vote($postId: Int!, $value: Int!) {

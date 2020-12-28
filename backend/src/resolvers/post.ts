@@ -23,11 +23,11 @@ import { FieldError } from "./types";
 
 @InputType()
 class PostInput {
-  @Field()
-  title!: string;
+  @Field({ nullable: true })
+  title: string;
 
-  @Field()
-  text!: string;
+  @Field({ nullable: true })
+  text: string;
 }
 
 @ObjectType()
@@ -147,7 +147,7 @@ export class PostResolver {
     // validate each of the inputs
     // structured in a way to add other validation later
     let errors: FieldError[] = [];
-    if (postInput.title.length < 1)
+    if (!postInput.title || postInput.title.length < 1)
       errors.push({
         field: "title",
         message: "title must be at least 1 char",
@@ -164,6 +164,8 @@ export class PostResolver {
         }
       );
     }
+
+    if (!postInput.text) postInput.text = "";
 
     const newPost = await PostRepository.create({
       ...postInput,
@@ -178,17 +180,24 @@ export class PostResolver {
   async updatePost(
     @Ctx() { req, orm: { PostRepository } }: MyContext,
     @Arg("id", () => Int) id: number,
-    @Arg("title", { nullable: true }) title?: string,
-    @Arg("text", { nullable: true }) text?: string
+    @Arg("postInput", () => PostInput) postInput: PostInput
   ): Promise<Post | null> {
     const matchedPost = await PostRepository.findOne({ id });
-    if (!matchedPost) return null;
+    if (!matchedPost)
+      throw new UserInputError(`post id provided is invalid`, {
+        fieldErrors: [
+          {
+            field: "id",
+            message: "post id provided is invalid",
+          },
+        ],
+      });
     if (matchedPost.creatorId !== req.session.userId)
       throw new ForbiddenError();
     // validate each of the inputs
     // structured in a way to add other validation later
     let errors: FieldError[] = [];
-    if (title == "")
+    if (postInput.title == "")
       errors.push({
         field: "title",
         message: "title must be at least 1 char",
@@ -206,8 +215,8 @@ export class PostResolver {
       );
     }
 
-    if (title) matchedPost.title = title;
-    if (text) matchedPost.text = text;
+    if (postInput.title) matchedPost.title = postInput.title;
+    if (postInput.text) matchedPost.text = postInput.text;
     await PostRepository.save(matchedPost);
     return matchedPost;
   }

@@ -1,4 +1,4 @@
-import { DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, Button, Flex, Heading, IconButton, Text } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
@@ -10,6 +10,7 @@ import {
   usePostQuery,
 } from "../../generated/graphql";
 import createUrqlClient from "../../utils/createUrqlClient";
+import NextLink from "next/link";
 
 interface PostProps {}
 
@@ -23,20 +24,6 @@ const Post: React.FC<PostProps> = ({}) => {
 
   const [{ data: meData }] = useMeQuery();
 
-  const [
-    { data: deleteResponse, fetching: deleteFetching },
-    deletePost,
-  ] = useDeletePostMutation();
-
-  const handleDeletePost = async (id: number) => {
-    const response = await deletePost({ id });
-    if (response.data?.deletePost) {
-      router.push("/");
-    } else {
-      console.error("post failed to delete");
-    }
-  };
-
   if (!postFetching && postData?.post) {
     const { id, title, text, points, creatorId } = postData.post;
     return (
@@ -45,17 +32,22 @@ const Post: React.FC<PostProps> = ({}) => {
           <Box mx={2} p={4} shadow="md" borderWidth="1px">
             {meData?.me && meData.me.id == creatorId ? (
               <Flex justifyContent="flex-end">
-                <Button
-                  leftIcon={<DeleteIcon />}
-                  colorScheme="red"
-                  size="sm"
-                  onClick={() => handleDeletePost(id)}
-                >
-                  delete post
-                </Button>
+                <NextLink href="/post/edit/[id]" as={`/post/edit/${id}`}>
+                  <Button
+                    as="a"
+                    leftIcon={<EditIcon />}
+                    colorScheme="purple"
+                    size="sm"
+                    variant="outline"
+                  >
+                    edit post
+                  </Button>
+                </NextLink>
               </Flex>
             ) : null}
-            <Heading textAlign="center">{title}</Heading>
+            <Heading textAlign="center" mt={2}>
+              {title}
+            </Heading>
             <Flex>
               <Text>{points} points</Text>
             </Flex>
