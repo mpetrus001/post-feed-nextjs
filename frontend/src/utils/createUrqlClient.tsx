@@ -24,9 +24,17 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
   );
 };
 
-const createUrqlClient = (ssrExchange: any) => ({
+const createUrqlClient = (ssrExchange: any, ctx: any) => ({
   url: "http://localhost:4000/graphql",
-  fetchOptions: { credentials: "include" as const },
+  fetchOptions: {
+    credentials: "include" as const,
+    // will include the cookie on initial request to support ssr
+    headers: ctx?.req?.headers.cookie
+      ? {
+          cookie: ctx.req.headers.cookie,
+        }
+      : undefined,
+  },
   exchanges: [
     dedupExchange,
     cacheExchange({
@@ -63,6 +71,7 @@ const createUrqlClient = (ssrExchange: any) => ({
                 };
               }
             );
+            cache.invalidate("Query", "posts", { limit: 15 });
           },
           logoutUser: (_result, args, cache, info) => {
             typedUpdateQuery<LogoutUserMutation, MeQuery>(
@@ -77,6 +86,7 @@ const createUrqlClient = (ssrExchange: any) => ({
                 };
               }
             );
+            cache.invalidate("Query", "posts", { limit: 15 });
           },
           createPost: (_result, args, cache, info) => {
             cache.invalidate("Query", "posts", { limit: 15 });

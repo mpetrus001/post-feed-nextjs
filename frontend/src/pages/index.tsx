@@ -88,7 +88,6 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
                     colorScheme={vote?.value == -1 ? "red" : "purple"}
                     size="xs"
                     aria-label="down vote"
-                    // TODO implement ui feedback on vote result
                     onClick={() => submitVote({ postId: id, value: -1 })}
                     isLoading={
                       voteFetching &&
@@ -137,4 +136,4 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(Index);
+export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
