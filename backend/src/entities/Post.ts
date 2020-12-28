@@ -49,6 +49,7 @@ export class Post extends BaseEntity {
   @Column()
   creatorId!: number;
 
+  // implement cascade to hide posts on delete
   @Field()
   @ManyToOne(() => User, (user) => user.posts)
   creator: User;

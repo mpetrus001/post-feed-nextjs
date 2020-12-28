@@ -6,6 +6,7 @@ import {
   Ctx,
   Field,
   FieldResolver,
+  ForbiddenError,
   InputType,
   Int,
   Mutation,
@@ -172,18 +173,44 @@ export class PostResolver {
     return newPost;
   }
 
-  // @Mutation(() => Post, { nullable: true })
-  // async updatePost(
-  //   @Arg("id") id: number,
-  //   @Arg("title") title: string,
-  //   @Ctx() { orm: { PostRepository } }: MyContext
-  // ): Promise<Post | null> {
-  //   const matchedPost = await PostRepository.findOne({ id });
-  //   if (!matchedPost) return null;
-  //   matchedPost.title = title;
-  //   await PostRepository.save(matchedPost);
-  //   return matchedPost;
-  // }
+  @Mutation(() => Post, { nullable: true })
+  @UseMiddleware(requireAuth)
+  async updatePost(
+    @Ctx() { req, orm: { PostRepository } }: MyContext,
+    @Arg("id", () => Int) id: number,
+    @Arg("title", { nullable: true }) title?: string,
+    @Arg("text", { nullable: true }) text?: string
+  ): Promise<Post | null> {
+    const matchedPost = await PostRepository.findOne({ id });
+    if (!matchedPost) return null;
+    if (matchedPost.creatorId !== req.session.userId)
+      throw new ForbiddenError();
+    // validate each of the inputs
+    // structured in a way to add other validation later
+    let errors: FieldError[] = [];
+    if (title == "")
+      errors.push({
+        field: "title",
+        message: "title must be at least 1 char",
+      });
+    if (errors.length > 0) {
+      let fields = errors.reduce(
+        (acc, error) => [...acc, error.field],
+        [] as string[]
+      );
+      throw new UserInputError(
+        `${JSON.stringify(fields)} did not pass format validation`,
+        {
+          fieldErrors: errors,
+        }
+      );
+    }
+
+    if (title) matchedPost.title = title;
+    if (text) matchedPost.text = text;
+    await PostRepository.save(matchedPost);
+    return matchedPost;
+  }
 
   @Mutation(() => Boolean)
   @UseMiddleware(requireAuth)
