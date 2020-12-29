@@ -1,6 +1,6 @@
-# Reddit Clone Backend
+# Post-Feed Backend
 
-A fullstack clone of reddit built with React, Typescript, and GraphQL.
+A fullstack post feed built with React, Typescript, and GraphQL.
 
 ## Description
 

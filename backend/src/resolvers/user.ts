@@ -252,7 +252,7 @@ export class UserResolver {
     // send the password reset email with link
     sendEmail({
       to: matchedUser.email,
-      subject: "Password Reset Link - Reddit-Clone",
+      subject: "Password Reset Link - Post-Feed",
       html: `<a href="http://localhost:3000/reset-password/${token}">Reset password</a>`,
     });
 

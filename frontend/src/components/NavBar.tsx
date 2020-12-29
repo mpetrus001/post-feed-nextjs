@@ -23,7 +23,7 @@ const NavBar: React.FC<NavBarProps> = ({ showUser = true }) => {
         maxWidth={[null, null, 700]}
       >
         <NextLink href="/">
-          <Heading cursor="pointer">Reddit-Clone</Heading>
+          <Heading cursor="pointer">Post-Feed</Heading>
         </NextLink>
         {!showUser || !!meFetching ? null : meData?.me ? (
           <Flex>

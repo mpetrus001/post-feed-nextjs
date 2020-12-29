@@ -1,5 +1,5 @@
 {
-  "name": "reddit-clone-frontend",
+  "name": "post-feed-frontend",
   "version": "1.0.0",
   "description": "Following along with a fullstack project tutorial by Ben Awad that teaches how to build a backend and frontend from scratch.",
   "main": "dist/index.js",
@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mpetrus001/reddit-clone.git"
+    "url": "git+https://github.com/mpetrus001/post-feed.git"
   },
   "keywords": [],
   "author": "MatthewP",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mpetrus001/reddit-clone/issues"
+    "url": "https://github.com/mpetrus001/post-feed/issues"
   },
-  "homepage": "https://github.com/mpetrus001/reddit-clone#readme",
+  "homepage": "https://github.com/mpetrus001/post-feed/frontend#readme",
   "dependencies": {
     "@chakra-ui/icons": "^1.0.0",
     "@chakra-ui/react": "^1.0.0",
