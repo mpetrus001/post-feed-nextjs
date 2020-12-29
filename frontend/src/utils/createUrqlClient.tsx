@@ -91,6 +91,9 @@ const createUrqlClient = (ssrExchange: any, ctx: any) => ({
           createPost: (_result, args, cache, info) => {
             cache.invalidate("Query", "posts", { limit: 15 });
           },
+          deletePost: (_result, args, cache, info) => {
+            cache.invalidate({ __typename: "Post", id: args.id as number });
+          },
           vote: (result, args, cache, info) => {
             if (result.vote) {
               // if the vote change was applied to the post then update cache
@@ -107,7 +110,6 @@ const createUrqlClient = (ssrExchange: any, ctx: any) => ({
                 { id: args.postId }
               );
 
-              console.log(postFragment);
               cache.writeFragment(
                 gql`
                   fragment _ on Post {
