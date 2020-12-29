@@ -2,5 +2,12 @@ query Post($id: Int!) {
   post(id: $id) {
     ...DefaultPost
     text
+    vote {
+      value
+    }
+    creator {
+      id
+      username
+    }
   }
 }

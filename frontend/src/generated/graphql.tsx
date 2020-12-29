@@ -77,21 +77,15 @@ export type User = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  vote: Scalars['Boolean'];
   createPost: Post;
   updatePost?: Maybe<Post>;
   deletePost: Scalars['Boolean'];
+  vote: Scalars['Boolean'];
   registerUser: User;
   loginUser: User;
   logoutUser: Scalars['Boolean'];
   resetPassword: Scalars['Boolean'];
   changePassword: User;
-};
-
-
-export type MutationVoteArgs = {
-  value: Scalars['Int'];
-  postId: Scalars['Int'];
 };
 
 
@@ -108,6 +102,12 @@ export type MutationUpdatePostArgs = {
 
 export type MutationDeletePostArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationVoteArgs = {
+  value: Scalars['Int'];
+  postId: Scalars['Int'];
 };
 
 
@@ -281,6 +281,13 @@ export type PostQuery = (
   & { post?: Maybe<(
     { __typename?: 'Post' }
     & Pick<Post, 'text'>
+    & { vote?: Maybe<(
+      { __typename?: 'UpVote' }
+      & Pick<UpVote, 'value'>
+    )>, creator: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    ) }
     & DefaultPostFragment
   )> }
 );
@@ -434,6 +441,13 @@ export const PostDocument = gql`
   post(id: $id) {
     ...DefaultPost
     text
+    vote {
+      value
+    }
+    creator {
+      id
+      username
+    }
   }
 }
     ${DefaultPostFragmentDoc}`;

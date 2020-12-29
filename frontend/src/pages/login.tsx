@@ -62,16 +62,24 @@ const Login: React.FC<LoginProps> = ({}) => {
               variant="password"
             />
           </Box>
-          <Flex mt={2} alignItems={"baseline"}>
+          <Flex mt={2} alignItems={"center"}>
             <Spacer />
-            <Text mr={4}>
-              not a user?{" "}
-              <NextLink href="/register">
-                <Link>register</Link>
-              </NextLink>
-            </Text>
+            <Box textAlign="right">
+              <Text>
+                not a user?{" "}
+                <NextLink href="/register">
+                  <Link>register</Link>
+                </NextLink>
+              </Text>
+              <Text>
+                forgot your password?{" "}
+                <NextLink href="/reset-password">
+                  <Link>reset password</Link>
+                </NextLink>
+              </Text>
+            </Box>
             <Button
-              mt={4}
+              ml={4}
               colorScheme="purple"
               color="whitesmoke"
               isLoading={isSubmitting}
@@ -81,14 +89,7 @@ const Login: React.FC<LoginProps> = ({}) => {
             </Button>
           </Flex>
         </form>
-        <Flex mt={4} justifyContent="flex-end">
-          <Text>
-            forgot your password?{" "}
-            <NextLink href="/reset-password">
-              <Link>reset password</Link>
-            </NextLink>
-          </Text>
-        </Flex>
+        <Flex mt={4} justifyContent="flex-end"></Flex>
       </Box>
     </Layout>
   );

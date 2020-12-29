@@ -22,7 +22,6 @@ const InputField: React.FC<InputFieldProps> = ({
       <FormControl isInvalid={!!errors[label]}>
         <FormLabel htmlFor={label}>{label}</FormLabel>
         <InputGroup>
-          <InputLeftAddon children="@" />
           <Input
             name={label}
             placeholder={label}

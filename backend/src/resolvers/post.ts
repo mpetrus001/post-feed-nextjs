@@ -1,6 +1,6 @@
 import { UserInputError } from "apollo-server-express";
 import { UpVote } from "../entities/UpVote";
-import { MyContext } from "src/types";
+import { MyContext } from "../types";
 import {
   Arg,
   Ctx,
@@ -16,7 +16,6 @@ import {
   Root,
   UseMiddleware,
 } from "type-graphql";
-// import { getConnection } from "typeorm";
 import { Post } from "../entities/Post";
 import { requireAuth } from "../middleware/requireAuth";
 import { FieldError } from "./types";
@@ -43,50 +42,6 @@ export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
     return root.text.slice(0, 150);
-  }
-
-  @Mutation(() => Boolean)
-  @UseMiddleware(requireAuth)
-  async vote(
-    @Arg("postId", () => Int) postId: number,
-    @Arg("value", () => Int) value: number,
-    @Ctx() { req, orm: { PostRepository } }: MyContext
-  ): Promise<boolean> {
-    value = value > 0 ? 1 : -1;
-    const currentVote = await UpVote.findOne({
-      postId,
-      userId: req.session.userId,
-    });
-    if (!currentVote) {
-      const newVote = UpVote.create({
-        postId,
-        userId: req.session.userId,
-        value,
-      });
-      if (value < 0) {
-        await PostRepository.decrement({ id: postId }, "points", 1);
-      } else {
-        await PostRepository.increment({ id: postId }, "points", 1);
-      }
-      await UpVote.save(newVote);
-      return true;
-    }
-
-    // my current vote is up and I change it to up: do nothing
-    if (currentVote.value > 0 && value > 0) return false;
-    // my current vote is down and I change it to down: do nothing
-    if (currentVote.value < 0 && value < 0) return false;
-    // my current vote is up and I send down: remove one point
-    if (currentVote.value >= 0 && value < 0) {
-      await PostRepository.decrement({ id: postId }, "points", 1);
-    }
-    // my current vote is down and I send up: add one point
-    if (currentVote.value <= 0 && value > 0) {
-      await PostRepository.increment({ id: postId }, "points", 1);
-    }
-    currentVote.value = currentVote.value + value;
-    await UpVote.save(currentVote);
-    return true;
   }
 
   @Query(() => PaginatedPosts)
@@ -131,9 +86,22 @@ export class PostResolver {
   @Query(() => Post, { nullable: true })
   async post(
     @Arg("id", () => Int) id: number,
-    @Ctx() { orm: { PostRepository } }: MyContext
+    @Ctx() { req, orm: { PostRepository } }: MyContext
   ): Promise<Post | null> {
-    const post = await PostRepository.findOne({ id });
+    const postQuery = await PostRepository.createQueryBuilder("post")
+      .where("post.id = :id", { id })
+      .leftJoinAndSelect("post.creator", "user");
+
+    if (req.session.userId) {
+      postQuery.leftJoinAndMapOne(
+        "post.vote",
+        "post.upvotes",
+        "vote",
+        "vote.userId = :userId",
+        { userId: req.session.userId }
+      );
+    }
+    const post = await postQuery.getOne();
     if (!post) return null;
     return post;
   }
@@ -233,5 +201,49 @@ export class PostResolver {
     });
     if (affected && affected > 0) return true;
     return false;
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(requireAuth)
+  async vote(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() { req, orm: { PostRepository } }: MyContext
+  ): Promise<boolean> {
+    value = value > 0 ? 1 : -1;
+    const currentVote = await UpVote.findOne({
+      postId,
+      userId: req.session.userId,
+    });
+    if (!currentVote) {
+      const newVote = UpVote.create({
+        postId,
+        userId: req.session.userId,
+        value,
+      });
+      if (value < 0) {
+        await PostRepository.decrement({ id: postId }, "points", 1);
+      } else {
+        await PostRepository.increment({ id: postId }, "points", 1);
+      }
+      await UpVote.save(newVote);
+      return true;
+    }
+
+    // my current vote is up and I change it to up: do nothing
+    if (currentVote.value > 0 && value > 0) return false;
+    // my current vote is down and I change it to down: do nothing
+    if (currentVote.value < 0 && value < 0) return false;
+    // my current vote is up and I send down: remove one point
+    if (currentVote.value >= 0 && value < 0) {
+      await PostRepository.decrement({ id: postId }, "points", 1);
+    }
+    // my current vote is down and I send up: add one point
+    if (currentVote.value <= 0 && value > 0) {
+      await PostRepository.increment({ id: postId }, "points", 1);
+    }
+    currentVote.value = currentVote.value + value;
+    await UpVote.save(currentVote);
+    return true;
   }
 }

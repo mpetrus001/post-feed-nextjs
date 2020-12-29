@@ -6,8 +6,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
-  IconButton,
   Input,
   Link,
   Spacer,
@@ -15,20 +13,19 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import Layout from "../../../components/Layout";
 import {
   useDeletePostMutation,
-  useUpdatePostMutation,
   usePostQuery,
+  useUpdatePostMutation,
 } from "../../../generated/graphql";
+import { addServerErrors } from "../../../utils/addServerErrors";
 import createUrqlClient from "../../../utils/createUrqlClient";
 import useRequireAuth from "../../../utils/useRequireAuth";
-import { useForm } from "react-hook-form";
-import InputField from "../../../components/InputField";
-import { addServerErrors } from "../../../utils/addServerErrors";
-import NextLink from "next/link";
 
 interface PostEditProps {}
 
@@ -66,17 +63,14 @@ const PostEdit: React.FC<PostEditProps> = ({}) => {
     });
   }, [postData]);
 
-  const [
-    { data: deleteResponse, fetching: deleteFetching },
-    deletePost,
-  ] = useDeletePostMutation();
+  const [{ fetching: deleteFetching }, deletePost] = useDeletePostMutation();
 
   const [, updatePost] = useUpdatePostMutation();
 
   const handleDeletePost = async (id: number) => {
     const response = await deletePost({ id });
     if (response.data?.deletePost) {
-      router.push("/");
+      router.push(postData?.post?.id ? `/post/${postData?.post?.id}` : "/");
     } else {
       console.error("post failed to delete");
     }
@@ -101,7 +95,7 @@ const PostEdit: React.FC<PostEditProps> = ({}) => {
   }
 
   if (!postFetching && postData?.post) {
-    const { id, title, text, points, creatorId } = postData.post;
+    const { id } = postData.post;
     return (
       <Layout>
         {id ? (
