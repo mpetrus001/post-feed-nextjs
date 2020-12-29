@@ -70,7 +70,7 @@ const PostEdit: React.FC<PostEditProps> = ({}) => {
   const handleDeletePost = async (id: number) => {
     const response = await deletePost({ id });
     if (response.data?.deletePost) {
-      router.push(postData?.post?.id ? `/post/${postData?.post?.id}` : "/");
+      router.push("/");
     } else {
       console.error("post failed to delete");
     }
@@ -88,7 +88,7 @@ const PostEdit: React.FC<PostEditProps> = ({}) => {
         setError
       );
     } else if (response.data?.updatePost) {
-      router.push("/");
+      router.push(postData?.post?.id ? `/post/${postData?.post?.id}` : "/");
     } else {
       console.error("Received an error: ", response.error);
     }
@@ -99,7 +99,7 @@ const PostEdit: React.FC<PostEditProps> = ({}) => {
     return (
       <Layout>
         {id ? (
-          <Box mx={2} p={4} shadow="md" borderWidth="1px">
+          <Box mx={[2, 2, 0]} p={4} shadow="md" borderWidth="1px">
             <Flex justifyContent="flex-end">
               <Button
                 leftIcon={<DeleteIcon />}
@@ -165,7 +165,11 @@ const PostEdit: React.FC<PostEditProps> = ({}) => {
               <Flex mt={2} alignItems={"baseline"}>
                 <Spacer />
                 <Text mr={4}>
-                  <NextLink href="/">
+                  <NextLink
+                    href={
+                      postData?.post?.id ? `/post/${postData?.post?.id}` : "/"
+                    }
+                  >
                     <Link>cancel</Link>
                   </NextLink>
                 </Text>

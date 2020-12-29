@@ -74,7 +74,7 @@ const Page = ({ variables, isLastPage, onLoadMore }: PageProps) => {
 
   return (
     <>
-      <Stack spacing={6} mb={6} px={2}>
+      <Stack spacing={6} mb={6} px={[2, 2, 0]}>
         {data?.posts.posts.map(
           ({ id, title, textSnippet, creator, points, vote }) =>
             !id ? null : (

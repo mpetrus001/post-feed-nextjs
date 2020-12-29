@@ -8,9 +8,11 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, showUser = true }) => {
   return (
-    <Box mx="auto" w="100%">
+    <Box w="100%">
       {showUser ? <NavBar /> : <NavBar showUser={false} />}
-      {children}
+      <Box mx="auto" maxWidth={[null, null, 700]}>
+        {children}
+      </Box>
     </Box>
   );
 };

@@ -42,7 +42,7 @@ const Post: React.FC<PostProps> = ({}) => {
     return (
       <Layout>
         {id ? (
-          <Box mx={2} p={4} shadow="md" borderWidth="1px">
+          <Box mx={[2, 2, 0]} p={4} shadow="md" borderWidth="1px">
             {meData?.me && meData.me.id == creator.id ? (
               <Flex justifyContent="flex-end">
                 <NextLink href="/post/edit/[id]" as={`/post/edit/${id}`}>
