@@ -25,7 +25,7 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
 };
 
 const createUrqlClient = (ssrExchange: any, ctx: any) => ({
-  url: process.env.API_URL as string,
+  url: process.env.NEXT_PUBLIC_API_URL as string,
   fetchOptions: {
     credentials: "include" as const,
     // will include the cookie on initial request to support ssr
