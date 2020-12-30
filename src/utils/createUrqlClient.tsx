@@ -25,7 +25,7 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
 };
 
 const createUrqlClient = (ssrExchange: any, ctx: any) => ({
-  url: "http://localhost:4000/graphql",
+  url: process.env.API_URL as string,
   fetchOptions: {
     credentials: "include" as const,
     // will include the cookie on initial request to support ssr
