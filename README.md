@@ -1,26 +1,18 @@
 # Post-Feed Frontend
 
-This is the frontend for a fullstack post feed built with React, Typescript, and GraphQL. See the backend for the project at [Post-Feed Backend](https://github.com/mpetrus001/post-feed-express).
+The frontend for a fullstack post feed built with React, Typescript, and GraphQL. A running example can be seen at [Post-Feed](https://post-feed.petrusprojects.com).
 
 ## Description
 
-Following along with Ben Awad on a fullstack project course that teaches how to build a backend and frontend from scratch then deploy it.
+The project is a feed of posts with a GraphQL API. A user can sign in using a username and password which generates a secure token. With that token/cookie, the home page will show the user's current upvotes and downvotes; votes can be changed by selecting the alternate arrow. A user can edit or delete their own posts by clicking the post title, and selecting edit post. The changes are reflected on the home page. The home page can be "infintely" scrolled by clicking load more on the bottom; this is achieved with cursor-pagination.
 
-Includes the follow technologies:
+The frontend is a NextJS app written in typescript using the URQL Graphql library. Some pages are rendered on the server to improve response times. The ui is based on the Chakra-UI library. Some features, including user registration and password reset have been disabled for security reasons.
 
-- TypeScript
-- NodeJS
-- PostgreSQL
-- MikroORM/TypeORM
-- GraphQL
-- TypeGraphQL
-- Redis
-- React
-- Next.js
-- Chakra
-- URQL
+A backend using Express with Apollo has been built; see [Post-Feed Backend](https://github.com/mpetrus001/post-feed-express) for more details.
 
-A link to the 14 hour video is here [Fullstack React GraphQL TypeScript Tutorial](https://youtu.be/I6ypD7qv3Z8).
+The project started by completing the Fullstack React GraphQL TypeScript Tutorial by Ben Awad. Completion of the tutorial resulted in an API server about 90% ready. Additional features were added to the server and the project was "dockerized" for deployment.
+
+The project includes the follow technologies: TypeScript, NodeJS, PostgreSQL, TypeORM, GraphQL, TypeGraphQL, Redis, React, Next.js, Chakra, URQL, Docker, and Docker-Compose.
 
 ## Getting Started
 
