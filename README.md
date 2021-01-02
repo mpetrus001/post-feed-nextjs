@@ -19,7 +19,7 @@ The project includes the follow technologies: TypeScript, NodeJS, PostgreSQL, Ty
 ### Developing
 
 1. Make sure that your backend project is running
-1. Run the server with auto-reload on file save
+1. Run the NextJS server with auto-reload on file save
 
 ```bash
 $ yarn dev
@@ -68,3 +68,7 @@ $ yarn gen
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details
+
+## Acknowledgements
+
+Primarily based on the [Fullstack React GraphQL TypeScript Tutorial](https://youtu.be/I6ypD7qv3Z8) by Ben Awad. An excellent introduction to building a frontend and backend app using NextJS, Apollo Graphql, and TypeORM.
