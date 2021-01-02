@@ -1,4 +1,12 @@
-import { Box, Button, Flex, Link, Spacer, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Link,
+  Spacer,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -20,6 +28,7 @@ interface FormData {
 
 const Register: React.FC<RegisterProps> = ({}) => {
   const router = useRouter();
+  const toast = useToast();
   const {
     handleSubmit,
     errors,
@@ -27,20 +36,21 @@ const Register: React.FC<RegisterProps> = ({}) => {
     setError,
     formState,
   } = useForm<FormData>();
-  const [, registerUser] = useRegisterUserMutation();
 
   async function onSubmit(values: FormData) {
-    const response = await registerUser({ userInput: values });
-    if (response.error?.graphQLErrors[0].extensions?.fieldErrors) {
-      addServerErrors(
-        response.error.graphQLErrors[0].extensions.fieldErrors,
-        setError
-      );
-    } else if (response.data?.registerUser) {
-      router.push("/");
-    } else {
-      console.error("Received an error: ", response.error);
-    }
+    // Removed ability to register for security reasons
+    toast({
+      title: "Action disabled.",
+      description:
+        "The ability to register has been disabled for security reasons. Thank you for trying!",
+      status: "warning",
+      duration: 8000,
+      isClosable: true,
+      position: "top",
+    });
+    setTimeout(() => {
+      router.replace("/");
+    }, 8500);
   }
 
   const { isSubmitting } = formState;
